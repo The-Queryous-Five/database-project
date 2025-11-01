@@ -6,8 +6,7 @@ def create_app():
     app.register_blueprint(products_bp)
 
     @app.get("/health")
-    def health():
-        return {"ok": True}
+    def health(): return {"ok": True}
     return app
 
 app = create_app()
