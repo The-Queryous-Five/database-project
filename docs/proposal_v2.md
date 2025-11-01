@@ -10,3 +10,10 @@
 - Geo_Zip (PK: geolocation_zip_code_prefix)
 - Sellers (PK: seller_id) — FK: zip→Geo_Zip
 - Order_Items (PK: order_id,order_item_id) — FK: order→Orders, product→Products, seller→Sellers
+
+## Database Support
+- **PostgreSQL** (primary): psycopg3 via dbapi2
+- **MySQL** (supported): mysql-connector-python via dbapi2
+- NO ORM — raw SQL with parameterized queries
+- ≥5 Foreign Keys enforced
+- DDL sets available for both vendors
