@@ -1,21 +1,28 @@
-# kullanıcı adlarını repo’daki gerçek GitHub handle’larıyla değiştir
-/app/blueprints/customers/   @mehmet
-/db/etl/load_customers.py    @mehmet
-/db/etl/load_geo_zip.py      @mehmet
+# --- Blueprints: her modülün sahibi ---
+/app/blueprints/customers/**  @itu-itis24-tekgozm21
+/app/blueprints/orders/**     @OzanOzyurt10
+/app/blueprints/products/**   @itu-itis22-aydinmer22
+/app/blueprints/payments/**   @omerdemirci44
+/app/blueprints/reviews/**    @itu-itis22-karaaslanmu21
 
-/app/blueprints/orders/      @ozan
-/db/etl/load_orders.py       @ozan
-/db/etl/load_order_items.py  @ozan
+# --- ETL: CSV yükleyiciler ---
+/db/etl/load_customers.py      @itu-itis24-tekgozm21
+/db/etl/load_geo_zip.py        @itu-itis24-tekgozm21
+/db/etl/load_orders.py         @OzanOzyurt10
+/db/etl/load_order_items.py    @OzanOzyurt10
+/db/etl/load_products.py       @itu-itis22-aydinmer22
+/db/etl/load_categories.py     @itu-itis22-aydinmer22
+/db/etl/load_payments.py       @omerdemirci44
+/db/etl/load_reviews.py        @itu-itis22-karaaslanmu21
 
-/app/blueprints/products/    @mert
-/db/etl/load_products.py     @mert
-/db/etl/load_categories.py   @mert
+# --- Şema ve SQL: ekip birlikte review etsin ---
+/db/ddl_mysql/**               @omerdemirci44 @itu-itis22-aydinmer22 @itu-itis22-karaaslanmu21 @itu-itis24-tekgozm21 @OzanOzyurt10
+/db/ddl/**                     @omerdemirci44 @itu-itis22-aydinmer22 @itu-itis22-karaaslanmu21 @itu-itis24-tekgozm21 @OzanOzyurt10
+/sql/**                        @omerdemirci44 @itu-itis22-aydinmer22 @itu-itis22-karaaslanmu21 @itu-itis24-tekgozm21 @OzanOzyurt10
 
-/app/blueprints/payments/    @omer
-/db/etl/load_payments.py     @omer
+# --- Script & Docs ---
+/scripts/**                    @omerdemirci44 @itu-itis22-aydinmer22 @itu-itis22-karaaslanmu21 @itu-itis24-tekgozm21 @OzanOzyurt10
+/docs/**                       @omerdemirci44 @itu-itis22-aydinmer22 @itu-itis22-karaaslanmu21 @itu-itis24-tekgozm21 @OzanOzyurt10
 
-/app/blueprints/reviews/     @yusa
-/db/etl/load_reviews.py      @yusa
-
-/db/ddl/                     @mehmet @ozan @mert @omer @yusa
-/sql/                        @mehmet @ozan @mert @omer @yusa
+# --- Varsayılan ---
+*                              @omerdemirci44 @itu-itis22-aydinmer22 @itu-itis22-karaaslanmu21 @itu-itis24-tekgozm21 @OzanOzyurt10
