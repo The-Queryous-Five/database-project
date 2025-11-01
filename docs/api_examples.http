@@ -1,0 +1,8 @@
+GET http://127.0.0.1:5000/health
+
+### örnek uçlar
+GET http://127.0.0.1:5000/payments/mix
+GET http://127.0.0.1:5000/payments/by-installments?min=3
+GET http://127.0.0.1:5000/products/sample?n=5
+GET http://127.0.0.1:5000/customers/by-state?state=SP
+GET http://127.0.0.1:5000/reviews/recent

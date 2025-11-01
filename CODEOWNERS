@@ -1,0 +1,21 @@
+# kullanıcı adlarını repo’daki gerçek GitHub handle’larıyla değiştir
+/app/blueprints/customers/   @mehmet
+/db/etl/load_customers.py    @mehmet
+/db/etl/load_geo_zip.py      @mehmet
+
+/app/blueprints/orders/      @ozan
+/db/etl/load_orders.py       @ozan
+/db/etl/load_order_items.py  @ozan
+
+/app/blueprints/products/    @mert
+/db/etl/load_products.py     @mert
+/db/etl/load_categories.py   @mert
+
+/app/blueprints/payments/    @omer
+/db/etl/load_payments.py     @omer
+
+/app/blueprints/reviews/     @yusa
+/db/etl/load_reviews.py      @yusa
+
+/db/ddl/                     @mehmet @ozan @mert @omer @yusa
+/sql/                        @mehmet @ozan @mert @omer @yusa

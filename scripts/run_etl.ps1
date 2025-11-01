@@ -1,0 +1,11 @@
+param([string]$Base="data/raw")
+python db/etl/load_categories.py      "$Base/product_category_name_translation.csv"
+python db/etl/load_geo_zip.py         "$Base/olist_geolocation_dataset.csv"
+python db/etl/load_products.py        "$Base/olist_products_dataset.csv"
+python db/etl/load_customers.py       "$Base/olist_customers_dataset.csv"
+python db/etl/load_sellers.py         "$Base/olist_sellers_dataset.csv"
+python db/etl/load_orders.py          "$Base/olist_orders_dataset.csv"
+python db/etl/load_order_items.py     "$Base/olist_order_items_dataset.csv"
+python db/etl/load_payments.py        "$Base/olist_order_payments_dataset.csv"
+python db/etl/load_reviews.py         "$Base/olist_order_reviews_dataset.csv"
+Write-Host "ETL finished."
