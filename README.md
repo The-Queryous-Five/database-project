@@ -1,7 +1,7 @@
-# Olist DB App (Flask + PostgreSQL, dbapi2, NO ORM)
+# Olist DB App (Flask + PostgreSQL/MySQL, dbapi2, NO ORM)
 - 5 main tablo ve ek tablolarla REST uçları.
 - Kurulum:
-  1) Python 3.11+ ve PostgreSQL 16 kurulu.
+  1) Python 3.11+ ve PostgreSQL 16 veya MySQL 8+ kurulu.
   2) PowerShell: `python -m venv venv`
      ardından: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process` → `Y`
      `.\venv\Scripts\Activate.ps1`
@@ -13,3 +13,32 @@
 - Sağlık: `GET /health`
 
 - LFS notu: tüm ekip bir kez `git lfs install` çalıştırsın.
+
+## MySQL ile Çalışma
+1) `.env` dosyasında:
+   ```
+   DB_VENDOR=mysql
+   DB_PORT=3306
+   DB_USER=root
+   DB_PASS=<your_password>
+   ```
+2) MySQL paketini yükle: `pip install mysql-connector-python==9.0.0`
+3) DDL uygula: `.\scripts\apply_ddl_mysql.ps1`
+4) ETL çalıştır (aynı script)
+
+## ETL DRY_RUN Modu (DB'siz veri önizleme)
+```powershell
+$env:DRY_RUN=1
+python db/etl/load_categories.py data/raw/product_category_name_translation.csv
+# Her dosya için ilk 3 satır örnek ve toplam satır sayısını gösterir
+```
+
+## Orphan Check (FK doğrulama)
+PostgreSQL:
+```powershell
+psql -U postgres -d olist -f scripts/check_orphans_postgres.sql
+```
+MySQL:
+```powershell
+mysql -u root -p olist < scripts/check_orphans_mysql.sql
+```
