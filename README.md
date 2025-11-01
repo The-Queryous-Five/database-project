@@ -11,3 +11,5 @@
   6) ETL sırası: categories → geo_zip → products → customers/sellers → orders → order_items → payments → reviews
   7) Çalıştır: `flask --app app/app.py --debug run`
 - Sağlık: `GET /health`
+
+- LFS notu: tüm ekip bir kez `git lfs install` çalıştırsın.
