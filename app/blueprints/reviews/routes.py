@@ -4,6 +4,10 @@ from .service import reviews_sample, recent_reviews
 
 @bp.get("/sample")
 def sample():
+    """
+    GET /reviews/sample?n=10
+    Returns n sample reviews (1-100). Default is 10.
+    """
     n_str = request.args.get("n", "10")
     try:
         n = int(n_str)
@@ -15,4 +19,8 @@ def sample():
 
 @bp.get("/recent")
 def recent():
+    """
+    GET /reviews/recent
+    Returns the 20 most recent reviews ordered by creation date.
+    """
     return jsonify(recent_reviews())
