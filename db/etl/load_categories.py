@@ -15,7 +15,7 @@ def load_categories(csv_path: str):  # product_category_name_translation.csv
     Uses parametrized executemany in batches with ON CONFLICT DO NOTHING.
     """
     DRY_RUN = get_env_bool("DRY_RUN")
-    
+
     with open(csv_path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         def gen_rows():
@@ -25,13 +25,13 @@ def load_categories(csv_path: str):  # product_category_name_translation.csv
                 if not name:
                     continue
                 yield (name, name_en)
-        
+
         all_rows = list(gen_rows())
-        
+
         if DRY_RUN:
             dry_insert_preview("categories", all_rows, len(all_rows))
             return
-        
+
         # Real DB insert
         from app.db.db import get_conn
         sql = (
@@ -44,7 +44,6 @@ def load_categories(csv_path: str):  # product_category_name_translation.csv
                 cur.executemany(sql, batch)
                 total += len(batch)
             print(f"categories loaded: {total}")
-
 
 if __name__ == "__main__":
     import sys

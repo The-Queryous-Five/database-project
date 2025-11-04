@@ -1,1 +1,11 @@
--- complex queries will be collected here
+-- 1) State distribution
+-- SELECT customer_state, COUNT(*) AS total_customers
+-- FROM customers
+-- GROUP BY customer_state
+-- ORDER BY total_customers DESC;
+-- 2) Zip density (top 10)
+-- SELECT customer_zip_code_prefix, COUNT(*) AS cnt
+-- FROM customers
+-- GROUP BY customer_zip_code_prefix
+-- ORDER BY cnt DESC
+-- LIMIT 10;
