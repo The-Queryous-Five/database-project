@@ -2,9 +2,10 @@
 Usage: python db/etl/load_order_items.py data/raw/olist_order_items_dataset.csv
 Parametrik INSERT kullan; executemany ile batch ekle.
 """
-from app.db.db import get_conn
+import os  # <-- EKLE (DRY_RUN KONTROLÜ İÇİN)
 import csv
 from typing import Iterable, List, Tuple, Optional
+from app.db.db import get_conn
 
 BATCH_SIZE = 5000
 
@@ -21,6 +22,33 @@ def _iter_batches(rows: Iterable[Tuple], batch_size: int = BATCH_SIZE):
 
 
 def load_order_items(csv_path: str):  # olist_order_items_dataset.csv
+
+    # --- YENİ DRY_RUN KONTROL BLOĞU ---
+    is_dry_run = os.environ.get('DRY_RUN') == '1'
+    if is_dry_run:
+        print(f"--- [DRY_RUN] load_order_items ({csv_path}) ---")
+        rows = []
+        try:
+            with open(csv_path, newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+            
+            print(f"Total rows found (ex-headers): {len(rows)}")
+            print("First 3 rows:")
+            for row in rows[:3]:
+                print(row)
+            print("--- End of DRY_RUN ---")
+        
+        except FileNotFoundError:
+            print(f"HATA: Dosya bulunamadı: {csv_path}")
+        except Exception as e:
+            print(f"DRY_RUN sırasında hata: {e}")
+        
+        return  # Fonksiyondan çık, veritabanına bağlanma
+    # --- DRY_RUN KONTROL BLOĞU SONU ---
+
+    # Orijinal kod (DRY_RUN = 0 ise buradan devam eder)
+    print("DRY_RUN=0. Connecting to database for real load...")
     sql = (
         "INSERT INTO order_items(order_id, order_item_id, product_id, seller_id, shipping_limit_date, price, freight_value) "
         "VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (order_id, order_item_id) DO NOTHING"
