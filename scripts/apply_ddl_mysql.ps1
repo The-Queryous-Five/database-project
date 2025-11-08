@@ -1,3 +1,4 @@
+# Run this after MySQL is installed and accessible
 param([string]$Db="olist",[string]$User="root",[string]$Pass="")
 $PassArg = if ($Pass) { "-p$Pass" } else { "" }
 mysql -u $User $PassArg -e "CREATE DATABASE IF NOT EXISTS $Db;"

@@ -14,6 +14,22 @@
 
 - LFS notu: tüm ekip bir kez `git lfs install` çalıştırsın.
 
+## Database Setup / DRY_RUN
+Henüz MySQL/PostgreSQL kurulu değilse ETL'ler **DRY_RUN=1** ile çalıştırılabilir.
+
+**Örnek komut:**
+```powershell
+$env:DRY_RUN=1
+python db/etl/load_products.py data/raw/olist_products_dataset.csv
+```
+
+**DRY_RUN modunda:**
+- Veritabanına yazılmaz
+- Sadece satır sayısı ve örnek satırlar (ilk 3) loglanır
+- DB bağlantısı gerekmez
+
+Bu mod, ETL scriptlerini test etmek ve veri kalitesini kontrol etmek için kullanılır.
+
 ## MySQL ile Çalışma
 1) `.env` dosyasında:
    ```
