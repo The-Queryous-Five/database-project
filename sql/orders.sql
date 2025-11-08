@@ -3,3 +3,5 @@
 
 -- Query 2: Sepet çeşitliliği analizi
 -- (Sipariş başına düşen ortalama ürün (order_items) sayısı veya farklı ürün kategorilerini analiz eden sorgu)
+
+-- Query 3: orders per day
