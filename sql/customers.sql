@@ -9,3 +9,9 @@
 -- GROUP BY customer_zip_code_prefix
 -- ORDER BY cnt DESC
 -- LIMIT 10;
+-- 3) Müşteri sayısı şehre göre
+-- SELECT customer_city, COUNT(*) AS total_customers
+-- FROM customers
+-- GROUP BY customer_city
+-- ORDER BY total_customers DESC;
+
