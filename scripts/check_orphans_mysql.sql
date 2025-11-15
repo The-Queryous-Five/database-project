@@ -28,3 +28,10 @@ UNION ALL SELECT 'orders', COUNT(*) FROM orders
 UNION ALL SELECT 'products', COUNT(*) FROM products
 UNION ALL SELECT 'order_payments', COUNT(*) FROM order_payments
 UNION ALL SELECT 'order_reviews', COUNT(*) FROM order_reviews;
+-- Customers → Geo_Zip
+SELECT COUNT(*) AS missing_geo
+FROM customers c
+LEFT JOIN geo_zip g 
+  ON g.geolocation_zip_code_prefix = c.customer_zip_code_prefix
+WHERE g.geolocation_zip_code_prefix IS NULL;
+

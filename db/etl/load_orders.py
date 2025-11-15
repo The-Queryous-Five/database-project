@@ -25,6 +25,7 @@ def load_orders(csv_path: str):  # olist_orders_dataset.csv
     
     # --- YENİ DRY_RUN KONTROL BLOĞU ---
     is_dry_run = os.environ.get('DRY_RUN') == '1'
+    DRY_RUN_ENV_VALUE = os.environ.get('DRY_RUN', '0')
     if is_dry_run:
         print(f"--- [DRY_RUN] load_orders ({csv_path}) ---")
         rows = []
@@ -39,6 +40,7 @@ def load_orders(csv_path: str):  # olist_orders_dataset.csv
             for row in rows[:3]:
                 print(row)
             print("--- End of DRY_RUN ---")
+            print(f"[orders] batch loaded (DRY_RUN={DRY_RUN_ENV_VALUE})")
         
         except FileNotFoundError:
             print(f"HATA: Dosya bulunamadı: {csv_path}")
@@ -72,6 +74,7 @@ def load_orders(csv_path: str):  # olist_orders_dataset.csv
             cur.executemany(sql, batch)
             total += len(batch)
         print(f"orders loaded: {total}")
+        print(f"[orders] batch loaded (DRY_RUN={DRY_RUN_ENV_VALUE})")
 
 
 if __name__ == "__main__":
