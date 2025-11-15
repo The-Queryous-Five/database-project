@@ -15,3 +15,10 @@
 -- GROUP BY customer_city
 -- ORDER BY total_customers DESC;
 
+-- top cities by customer count
+-- SELECT customer_city, COUNT(*) AS customer_count
+-- FROM customers
+-- GROUP BY customer_city
+-- ORDER BY customer_count DESC
+-- LIMIT 5;
+
