@@ -42,3 +42,19 @@ MySQL:
 ```powershell
 mysql -u root -p olist < scripts/check_orphans_mysql.sql
 ```
+
+## Frontend Demo (Week 4)
+
+1) Flask API'yi başlat:
+   ```powershell
+   flask --app app/app.py --debug run
+   ```
+
+2) `frontend/index.html` dosyasını tarayıcıda aç (File → Open veya sürükle-bırak)
+
+3) Örneğin "Payments" bölümünden:
+   - `payment_type` alanına `credit_card` yaz
+   - "Get payments by type" butonuna bas
+   - `GET /payments/by-type` endpoint'inin sonucunu görebilirsin
+
+Not: CORS sorunu yaşarsan Flask app'e `flask-cors` ekleyip `CORS(app)` yapabilirsin.
