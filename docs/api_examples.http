@@ -14,3 +14,6 @@ GET http://localhost:5000/payments/by-type?payment_type=credit_card
 GET http://localhost:5000/reviews/stats?min_score=1&max_score=5
 GET http://localhost:5000/reviews/stats?min_score=4&max_score=5
 GET http://localhost:5000/reviews/stats?min_score=1&max_score=3
+
+### Orders of a customer
+GET http://localhost:5000/orders/by-customer/1234567890?limit=5
