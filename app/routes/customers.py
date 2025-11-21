@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.db import db
+from psycopg import OperationalError  # DB hatasını yakalamak için
 
 bp_customers = Blueprint("customers", __name__)
 
@@ -8,7 +9,8 @@ def customers_by_state():
     state = request.args.get("state")
     if not state:
         return jsonify({"error": "Missing required parameter: state"}), 400
-    # TODO: replace with real DB query later
+
+    # Şimdilik dummy cevap (Week 1’deki gibi)
     return jsonify({"state": state, "total_customers": 0})
 
 
@@ -39,6 +41,9 @@ def customers_top_cities():
     if limit < 1 or limit > 50:
         return jsonify({"error": "limit must be between 1 and 50"}), 422
 
-    rows = get_top_cities(limit)
-    return jsonify(rows)
-
+    try:
+        rows = get_top_cities(limit)
+        return jsonify(rows)
+    except OperationalError:
+        # Postgres ayakta değilse buraya düşer
+        return jsonify({"error": "database not available (top-cities)"}), 503
