@@ -37,9 +37,19 @@
     <div id="customers-results" class="results"></div>
     </section>
 
-    <section id="orders-section">
-        <h2>Orders</h2>
-        <p>Orders UI will be implemented in a separate task.</p>
+    <section id="orders-section" style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px;">
+        <h3>Orders Management </h3>
+        <div class="input-group">
+            <label>Customer ID:</label>
+            <input type="text" id="orders-customer-id" placeholder="Müşteri ID girin">
+            
+            <label>Limit:</label>
+            <input type="number" id="orders-limit" value="5" min="1" max="50">
+            
+            <button onclick="loadOrdersByCustomer()">Siparişleri Getir</button>
+        </div>
+
+        <div id="orders-results" style="margin-top: 20px;"></div>
     </section>
 
     <section id="products-section">
