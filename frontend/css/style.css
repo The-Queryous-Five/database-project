@@ -8,3 +8,62 @@ button { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; cursor: 
 .msg { margin: 8px 0; }
 .results table { border-collapse: collapse; width: 100%; margin-top: 8px; }
 .results th, .results td { padding: 8px; border: 1px solid #eee; text-align: left; }
+
+/* Review stats styling */
+.stats-summary {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+.stats-summary h4 {
+    margin: 0 0 12px 0;
+    color: #495057;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat-item {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.stats-info {
+    margin: 12px 0 0 0;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid #0d6efd;
+}
+
+.error {
+    color: #dc3545;
+    background: #f8d7da;
+    border: 1px solid #f5c2c7;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 8px 0;
+}
