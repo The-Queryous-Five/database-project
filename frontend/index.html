@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olist Analytics Demo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>Olist Analytics Demo</header>
+
+    <nav>
+        <a href="#customers-section">Customers</a>
+        <a href="#orders-section">Orders</a>
+        <a href="#products-section">Products</a>
+        <a href="#payments-section">Payments</a>
+        <a href="#reviews-section">Reviews</a>
+    </nav>
+
+    <section id="customers-section">
+        <h2>Customers</h2>
+        
+    <div class="form-group">
+        <label>State:</label>
+        <input id="customers-state" placeholder="State (e.g., SP)">
+    </div>
+
+    <div class="form-group">
+        <label>Limit (top cities):</label>
+        <input id="customers-limit" type="number" value="5" min="1" max="50">
+    </div>
+
+    <button onclick="loadCustomersByState()">Get customers by state</button>
+    <button onclick="loadTopCities()">Get top cities</button>
+
+    <h3>Results:</h3>
+    <div id="customers-results" class="results"></div>
+    </section>
+
+    <section id="orders-section">
+        <h2>Orders</h2>
+        <p>Orders UI will be implemented in a separate task.</p>
+    </section>
+
+    <section id="products-section">
+        <h2>Products</h2>
+        <p>Products UI will be implemented in a separate task.</p>
+    </section>
+
+    <section id="payments-section">
+        <h2>Payments</h2>
+        <div class="form-group">
+            <label for="payment-type-input">Payment Type:</label>
+            <input id="payment-type-input" type="text" placeholder="payment_type (e.g. credit_card)" value="credit_card">
+            <button id="payments-by-type-btn">Get payments by type</button>
+        </div>
+        <div id="payments-error" class="error"></div>
+        <div id="payments-results"></div>
+    </section>
+
+    <section id="reviews-section">
+        <h2>Reviews</h2>
+        <p>Reviews UI will be implemented in a separate task.</p>
+    </section>
+
+    <script src="js/customers.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/payments.js"></script>
+    <script src="js/reviews.js"></script>
+</body>
+</html>
