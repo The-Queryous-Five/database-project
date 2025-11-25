@@ -88,3 +88,21 @@ async function loadOrdersByCustomer() {
         showErrorOrders(resultsDiv, `Error: ${error.message}`);
     }
 }
+
+// ============ DEMO FUNCTIONS ============
+
+document.addEventListener("DOMContentLoaded", () => {
+    const demoBtn = document.getElementById("orders-demo-btn");
+    if (demoBtn) {
+        demoBtn.addEventListener("click", () => {
+            const customerIdInput = document.getElementById("orders-customer-id");
+            const limitInput = document.getElementById("orders-limit");
+            
+            // Use a placeholder customer ID (user should replace with real one)
+            if (customerIdInput) customerIdInput.value = "PASTE_VALID_CUSTOMER_ID_HERE";
+            if (limitInput) limitInput.value = "5";
+            
+            alert("Please replace the placeholder customer ID with a real one from your database, then click 'Get orders by customer'");
+        });
+    }
+});

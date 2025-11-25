@@ -159,6 +159,16 @@ button:active {
     transform: translateY(0);
 }
 
+button.demo-btn {
+    background: #48bb78;
+    font-size: 0.9rem;
+}
+
+button.demo-btn:hover {
+    background: #38a169;
+    box-shadow: 0 4px 8px rgba(72, 187, 120, 0.3);
+}
+
 /* Results Container */
 .results-container {
     margin-top: 1.5rem;

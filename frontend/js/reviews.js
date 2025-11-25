@@ -101,5 +101,20 @@ async function loadReviewStats() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Demo button handler
+    const demoBtn = document.getElementById("reviews-demo-btn");
+    if (demoBtn) {
+        demoBtn.addEventListener("click", () => {
+            const minScoreInput = document.getElementById("reviews-min-score");
+            const maxScoreInput = document.getElementById("reviews-max-score");
+            
+            if (minScoreInput) minScoreInput.value = "4";
+            if (maxScoreInput) maxScoreInput.value = "5";
+            
+            // Auto-trigger the query
+            loadReviewStats();
+        });
+    }
+    
     console.log("reviews.js loaded - Review stats UI ready");
 });

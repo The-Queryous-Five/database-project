@@ -99,5 +99,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Attach event listener
     button.addEventListener("click", onPaymentsByTypeClick);
+    
+    // Demo button handler
+    const demoBtn = document.getElementById("payments-demo-btn");
+    if (demoBtn) {
+        demoBtn.addEventListener("click", () => {
+            if (typeInput) typeInput.value = "credit_card";
+            
+            // Auto-trigger the query
+            onPaymentsByTypeClick();
+        });
+    }
+    
     console.log("payments.js loaded - ready to fetch payment data");
 });

@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </label>
         <button id="btn-products-by-category">Get products by category</button>
         <button id="btn-top-categories">Show top categories</button>
+        <button id="products-demo-btn" class="demo-btn">📝 Use demo values</button>
       </div>
       <div id="products-msg" class="msg"></div>
       <div id="products-results" class="results"></div>
@@ -139,30 +140,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-products-by-category')?.addEventListener('click', loadProductsByCategory);
   document.getElementById('btn-top-categories')?.addEventListener('click', loadTopCategories);
-});
-
-// UI'yı Products section'a enjekte et
-document.addEventListener('DOMContentLoaded', () => {
-  const sec = document.getElementById('products-section');
-  if (!sec) return;
-
-  if (!document.getElementById('products-category-id')) {
-    sec.insertAdjacentHTML('beforeend', `
-      <div class="controls">
-        <label>Category ID:
-          <input id="products-category-id" type="number" placeholder="e.g. 21">
-        </label>
-        <label>Limit:
-          <input id="products-limit" type="number" value="10" min="1" max="100">
-        </label>
-        <button id="btn-products-by-category">Get products by category</button>
-        <button id="btn-top-categories">Show top categories</button>
-      </div>
-      <div id="products-msg" class="msg"></div>
-      <div id="products-results" class="results"></div>
-    `);
-  }
-
-  document.getElementById('btn-products-by-category')?.addEventListener('click', loadProductsByCategory);
-  document.getElementById('btn-top-categories')?.addEventListener('click', loadTopCategories);
+  
+  // Demo button handler
+  document.getElementById('products-demo-btn')?.addEventListener('click', () => {
+    const categoryInput = document.getElementById('products-category-id');
+    const limitInput = document.getElementById('products-limit');
+    
+    if (categoryInput) categoryInput.value = '1';
+    if (limitInput) limitInput.value = '10';
+    
+    // Auto-trigger the query
+    loadProductsByCategory();
+  });
 });

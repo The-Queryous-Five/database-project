@@ -128,3 +128,21 @@ async function loadTopCities() {
         showError(resultsDiv, "Error loading top cities.");
     }
 }
+
+// ============ DEMO FUNCTIONS ============
+
+document.addEventListener("DOMContentLoaded", () => {
+    const demoBtn = document.getElementById("customers-demo-btn");
+    if (demoBtn) {
+        demoBtn.addEventListener("click", () => {
+            const stateInput = document.getElementById("customers-state");
+            const limitInput = document.getElementById("customers-limit");
+            
+            if (stateInput) stateInput.value = "SP";
+            if (limitInput) limitInput.value = "10";
+            
+            // Auto-trigger the query
+            loadTopCities();
+        });
+    }
+});
