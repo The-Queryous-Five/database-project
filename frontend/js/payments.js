@@ -1,19 +1,33 @@
 "use strict";
 
+const API_BASE = "http://127.0.0.1:5000";
+
 /**
  * Render payments by type result in the container
- * @param {HTMLElement} container - The container element to render results in
- * @param {Object} data - The payment data object
- * @param {string} data.payment_type - The payment type
- * @param {number} data.payment_count - Number of payments
- * @param {number} data.total_value - Total value of payments
  */
 function renderPaymentsByTypeResult(container, data) {
-    container.innerHTML = `
-        <p>Type: <strong>${data.payment_type}</strong></p>
-        <p>Count: ${data.payment_count}</p>
-        <p>Total value: ${data.total_value.toFixed(2)}</p>
-    `;
+    if (!data.payments || data.payments.length === 0) {
+        container.innerHTML = `<p>No payments found for type: <strong>${data.payment_type}</strong></p>`;
+        return;
+    }
+    
+    let html = `<p>Payment Type: <strong>${data.payment_type}</strong></p>`;
+    html += `<p>Total Results: ${data.row_count}</p>`;
+    html += `<table><thead><tr>`;
+    html += `<th>Order ID</th><th>Sequential</th><th>Installments</th><th>Value</th>`;
+    html += `</tr></thead><tbody>`;
+    
+    for (const payment of data.payments) {
+        html += `<tr>`;
+        html += `<td>${payment.order_id || ''}</td>`;
+        html += `<td>${payment.payment_sequential ?? ''}</td>`;
+        html += `<td>${payment.payment_installments ?? ''}</td>`;
+        html += `<td>${payment.payment_value ? payment.payment_value.toFixed(2) : 'N/A'}</td>`;
+        html += `</tr>`;
+    }
+    
+    html += `</tbody></table>`;
+    container.innerHTML = html;
 }
 
 /**
@@ -22,22 +36,29 @@ function renderPaymentsByTypeResult(container, data) {
 async function onPaymentsByTypeClick() {
     const errorDiv = document.querySelector("#payments-error");
     const resultsDiv = document.querySelector("#payments-results");
-    const input = document.querySelector("#payment-type-input");
+    const typeInput = document.querySelector("#payment-type-input");
+    const limitInput = document.querySelector("#payments-limit");
 
     // Clear previous results and errors
     errorDiv.textContent = "";
     resultsDiv.innerHTML = "";
 
     // Get and validate input
-    const paymentType = input.value.trim();
+    const paymentType = typeInput.value.trim();
     if (!paymentType) {
         errorDiv.textContent = "payment_type is required";
         return;
     }
 
+    const limit = limitInput?.value ? parseInt(limitInput.value) : 20;
+
     try {
-        // Make API request
-        const url = `http://localhost:5000/payments/by-type?payment_type=${encodeURIComponent(paymentType)}`;
+        // Build URL with URLSearchParams
+        const params = new URLSearchParams({ 
+            payment_type: paymentType,
+            limit: limit
+        });
+        const url = `${API_BASE}/payments/by-type?${params.toString()}`;
         const response = await fetch(url);
 
         if (response.status === 400 || response.status === 422) {
@@ -66,12 +87,12 @@ async function onPaymentsByTypeClick() {
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
     const button = document.querySelector("#payments-by-type-btn");
-    const input = document.querySelector("#payment-type-input");
+    const typeInput = document.querySelector("#payment-type-input");
     const resultsDiv = document.querySelector("#payments-results");
     const errorDiv = document.querySelector("#payments-error");
 
     // Check if all required elements exist
-    if (!button || !input || !resultsDiv || !errorDiv) {
+    if (!button || !typeInput || !resultsDiv || !errorDiv) {
         console.error("Payments UI elements not found");
         return;
     }

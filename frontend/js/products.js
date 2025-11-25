@@ -19,51 +19,114 @@ function renderTable(containerId, rows) {
   host.innerHTML = `<table>${thead}${tbody}</table>`;
 }
 
-// ÇALIŞAN BUTON: Get products by category
+// Get products by category
 async function loadProductsByCategory() {
   setMsg('');
   const idEl = document.getElementById('products-category-id');
   const limEl = document.getElementById('products-limit');
   const categoryId = String(idEl?.value || '').trim();
   const limit = Number(limEl?.value || 10);
-  if (!categoryId) { setMsg('Please enter category_id', true); return; }
+  
+  if (!categoryId) { 
+    setMsg('Please enter category_id', true); 
+    return; 
+  }
 
-  const url = `${BASE_URL}/products/by-category/${encodeURIComponent(categoryId)}?limit=${encodeURIComponent(limit)}`;
+  const params = new URLSearchParams({ category_id: categoryId, limit: limit });
+  const url = `${BASE_URL}/products/by-category?${params.toString()}`;
+  
   try {
     const resp = await fetch(url);
+    
+    if (resp.status === 400 || resp.status === 422) {
+      const errorData = await resp.json();
+      setMsg(errorData.error || 'Validation error', true);
+      return;
+    }
+    
     if (!resp.ok) {
-      // Backend endpoint yoksa /products/sample ile fallback yap
-      if (resp.status === 404) {
-        const sample = await fetch(`${BASE_URL}/products/sample?n=${encodeURIComponent(limit)}`);
-        if (sample.ok) {
-          const data = await sample.json();
-          renderTable('products-results', data.items || data || []);
-          setMsg('Using /products/sample fallback (by-category not implemented)');
-          return;
-        }
-      }
       const text = await resp.text();
       setMsg(`Request failed (${resp.status}): ${text}`, true);
       return;
     }
+    
     const data = await resp.json();
-    renderTable('products-results', data.items || data || []);
+    
+    if (data.products && data.products.length > 0) {
+      renderTable('products-results', data.products);
+      setMsg(`Found ${data.row_count} products in category ${data.category_id}`);
+    } else {
+      document.getElementById('products-results').innerHTML = '<p>No products found for this category.</p>';
+    }
   } catch (e) {
     console.error(e);
-    setMsg('Error loading products', true);
+    setMsg('Network error - is the Flask API running?', true);
   }
 }
 
-// ŞİMDİLİK SADECE TODO MESAJI: Show top categories
-function loadTopCategories() {
-  setMsg('Top categories endpoint is not implemented yet (TODO – uses Week 2 SQL).');
-  const demo = [
-    { category: 'perfumaria', product_count: 1234 },
-    { category: 'esporte_lazer', product_count: 987 },
-    { category: 'moveis_decoracao', product_count: 850 },
-  ];
-  renderTable('products-results', demo);
+// Show top categories
+async function loadTopCategories() {
+  setMsg('');
+  const limEl = document.getElementById('products-limit');
+  const limit = Number(limEl?.value || 10);
+
+  const params = new URLSearchParams({ limit: limit });
+  const url = `${BASE_URL}/products/top-categories?${params.toString()}`;
+  
+  try {
+    const resp = await fetch(url);
+    
+    if (resp.status === 400 || resp.status === 422) {
+      const errorData = await resp.json();
+      setMsg(errorData.error || 'Validation error', true);
+      return;
+    }
+    
+    if (!resp.ok) {
+      const text = await resp.text();
+      setMsg(`Request failed (${resp.status}): ${text}`, true);
+      return;
+    }
+    
+    const data = await resp.json();
+    
+    if (data.categories && data.categories.length > 0) {
+      renderTable('products-results', data.categories);
+      setMsg(`Showing top ${data.categories.length} categories`);
+    } else {
+      document.getElementById('products-results').innerHTML = '<p>No categories found.</p>';
+    }
+  } catch (e) {
+    console.error(e);
+    setMsg('Network error - is the Flask API running?', true);
+  }
 }
+
+// UI'yı Products section'a enjekte et
+document.addEventListener('DOMContentLoaded', () => {
+  const sec = document.getElementById('products-section');
+  if (!sec) return;
+
+  if (!document.getElementById('products-category-id')) {
+    sec.insertAdjacentHTML('beforeend', `
+      <div class="controls">
+        <label>Category ID:
+          <input id="products-category-id" type="number" placeholder="e.g. 21">
+        </label>
+        <label>Limit:
+          <input id="products-limit" type="number" value="10" min="1" max="100">
+        </label>
+        <button id="btn-products-by-category">Get products by category</button>
+        <button id="btn-top-categories">Show top categories</button>
+      </div>
+      <div id="products-msg" class="msg"></div>
+      <div id="products-results" class="results"></div>
+    `);
+  }
+
+  document.getElementById('btn-products-by-category')?.addEventListener('click', loadProductsByCategory);
+  document.getElementById('btn-top-categories')?.addEventListener('click', loadTopCategories);
+});
 
 // UI'yı Products section'a enjekte et
 document.addEventListener('DOMContentLoaded', () => {

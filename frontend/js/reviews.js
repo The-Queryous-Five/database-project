@@ -5,7 +5,7 @@
  * Week 4 Task: Display review stats filtered by score range (1-5)
  */
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "http://127.0.0.1:5000";
 
 /**
  * Load review statistics based on min_score and max_score
@@ -52,46 +52,50 @@ async function loadReviewStats() {
         // Show loading state
         resultsDiv.innerHTML = "<p>Loading...</p>";
         
-        // Make API request
-        const url = `${API_BASE_URL}/reviews/stats?min_score=${minScore}&max_score=${maxScore}`;
+        // Build URL with URLSearchParams
+        const params = new URLSearchParams({
+            min_score: minScore,
+            max_score: maxScore
+        });
+        const url = `${API_BASE_URL}/reviews/stats?${params.toString()}`;
         const response = await fetch(url);
         
-        if (!response.ok) {
+        if (response.status === 400 || response.status === 422) {
             const errorData = await response.json();
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            errorDiv.textContent = errorData.error || "Validation error";
+            resultsDiv.innerHTML = "";
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
         
-        // Display results in a nice summary box
-        resultsDiv.innerHTML = `
-            <div class="stats-summary">
-                <h4>📊 Review Statistics</h4>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">Score Range:</span>
-                        <span class="stat-value">${data.min_score} - ${data.max_score}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Average Score:</span>
-                        <span class="stat-value">${data.avg_score ? data.avg_score.toFixed(2) : 'N/A'}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Review Count:</span>
-                        <span class="stat-value">${data.review_count.toLocaleString()}</span>
-                    </div>
-                </div>
-                <p class="stats-info">
-                    Reviews with scores between ${data.min_score} and ${data.max_score}: 
-                    <strong>Average ${data.avg_score ? data.avg_score.toFixed(2) : 'N/A'}</strong>, 
-                    <strong>${data.review_count.toLocaleString()} reviews</strong>
-                </p>
-            </div>
-        `;
+        // Build stats table with backend response format (total_reviews, average_score, stats)
+        let html = `<div class="stats-summary">`;
+        html += `<h4>📊 Review Statistics</h4>`;
+        html += `<p><strong>Score Range:</strong> ${data.min_score} - ${data.max_score}</p>`;
+        html += `<p><strong>Total Reviews:</strong> ${data.total_reviews.toLocaleString()}</p>`;
+        html += `<p><strong>Average Score:</strong> ${data.average_score !== null ? data.average_score.toFixed(2) : 'N/A'}</p>`;
+        html += `</div>`;
+        
+        if (data.stats && data.stats.length > 0) {
+            html += `<table><thead><tr><th>Review Score</th><th>Review Count</th></tr></thead><tbody>`;
+            for (const stat of data.stats) {
+                html += `<tr><td>${stat.review_score}</td><td>${stat.review_count.toLocaleString()}</td></tr>`;
+            }
+            html += `</tbody></table>`;
+        } else {
+            html += `<p>No reviews found in this score range.</p>`;
+        }
+        
+        resultsDiv.innerHTML = html;
         
     } catch (error) {
         console.error("Error loading review stats:", error);
-        errorDiv.textContent = `❌ Error loading review stats: ${error.message}`;
+        errorDiv.textContent = `❌ Network error - is the Flask API running?`;
         resultsDiv.innerHTML = "";
     }
 }
