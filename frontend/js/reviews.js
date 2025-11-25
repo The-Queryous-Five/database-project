@@ -73,7 +73,7 @@ async function loadReviewStats() {
         
         const data = await response.json();
         
-        // Build stats table
+        // Build stats table with backend response format (total_reviews, average_score, stats)
         let html = `<div class="stats-summary">`;
         html += `<h4>📊 Review Statistics</h4>`;
         html += `<p><strong>Score Range:</strong> ${data.min_score} - ${data.max_score}</p>`;
