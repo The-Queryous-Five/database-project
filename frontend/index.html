@@ -52,10 +52,49 @@
         <div id="orders-results" style="margin-top: 20px;"></div>
     </section>
 
-    <section id="products-section">
-        <h2>Products</h2>
-        <p>Products UI will be implemented in a separate task.</p>
-    </section>
+<section id="products-section" class="module-card">
+  <div class="module-header">
+    <h2>Products</h2>
+    <p class="module-subtitle">
+      Filter products by category or preview our top-selling categories.
+    </p>
+  </div>
+
+  <div class="module-grid">
+    <div class="module-form">
+      <label class="field">
+        <span>Category ID</span>
+        <input id="products-category-id" type="number" placeholder="e.g. 21">
+      </label>
+
+      <label class="field">
+        <span>Limit</span>
+        <input id="products-limit" type="number" value="10" min="1" max="100">
+      </label>
+
+      <div class="buttons-row">
+        <button id="btn-products-by-category" class="btn primary">
+          Get products by category
+        </button>
+        <button id="btn-top-categories" class="btn secondary">
+          Show top categories
+        </button>
+      </div>
+
+      <p class="hint">
+        Tip: For demo, try <strong>category 21</strong> with limit <strong>10</strong>.
+      </p>
+
+      <div id="products-msg" class="msg"></div>
+    </div>
+
+    <div class="module-results">
+      <h3>Results</h3>
+      <div id="products-results" class="results"></div>
+    </div>
+  </div>
+</section>
+
 
     <section id="payments-section">
         <h2>Payments</h2>
