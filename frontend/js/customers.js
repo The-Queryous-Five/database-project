@@ -2,116 +2,129 @@
 
 const API_BASE = "http://127.0.0.1:5000";
 
-function setCustomersError(message) {
-    const el = document.getElementById("customers-results");
-    if (!el) return;
-    if (!message) {
-        return;
-    }
-    el.innerHTML = `<p style="color:red">${message}</p>`;
+// ============ HELPER FUNCTIONS ============
+
+function showLoading(container) {
+    if (!container) return;
+    container.innerHTML = '<p class="info-message">Loading...</p>';
 }
 
-function renderCustomersByState(rows) {
-    const container = document.getElementById("customers-results");
+function clearLoading(container) {
     if (!container) return;
+    // Loading will be replaced by results or error
+}
 
+function showError(container, message) {
+    if (!container) return;
+    container.innerHTML = `<p class="error-message">${message}</p>`;
+}
+
+function clearError(container) {
+    if (!container) return;
+    container.innerHTML = '';
+}
+
+function renderTable(container, columns, rows) {
+    if (!container) return;
+    
     if (!rows || rows.length === 0) {
-        container.innerHTML = "<p>No customers found for this state.</p>";
+        container.innerHTML = '<p>No data found.</p>';
         return;
     }
-
-    let html = "<table><thead><tr>";
-    html += "<th>customer_id</th><th>customer_city</th><th>customer_state</th>";
-    html += "</tr></thead><tbody>";
-
-    for (const row of rows) {
-        html += `<tr>
-            <td>${row.customer_id ?? ""}</td>
-            <td>${row.customer_city ?? ""}</td>
-            <td>${row.customer_state ?? ""}</td>
-        </tr>`;
-    }
-
-    html += "</tbody></table>";
+    
+    let html = '<table><thead><tr>';
+    columns.forEach(col => {
+        html += `<th>${col.label}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    rows.forEach(row => {
+        html += '<tr>';
+        columns.forEach(col => {
+            html += `<td>${row[col.key] ?? ''}</td>`;
+        });
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
     container.innerHTML = html;
 }
 
-function renderTopCities(rows) {
-    const container = document.getElementById("customers-results");
-    if (!container) return;
-
-    if (!rows || rows.length === 0) {
-        container.innerHTML = "<p>No cities found.</p>";
-        return;
-    }
-
-    let html = "<table><thead><tr>";
-    html += "<th>customer_city</th><th>customer_count</th>";
-    html += "</tr></thead><tbody>";
-
-    for (const row of rows) {
-        html += `<tr>
-            <td>${row.customer_city ?? ""}</td>
-            <td>${row.customer_count ?? 0}</td>
-        </tr>`;
-    }
-
-    html += "</tbody></table>";
-    container.innerHTML = html;
-}
+// ============ API FUNCTIONS ============
 
 async function loadCustomersByState() {
     const stateInput = document.getElementById("customers-state");
-    const state = (stateInput?.value || "").trim();
     const resultsDiv = document.getElementById("customers-results");
+    
+    clearError(resultsDiv);
+    
+    const state = (stateInput?.value || "").trim();
 
     if (!state) {
-        setCustomersError("State is required (e.g. SP).");
+        showError(resultsDiv, "State is required (e.g. SP).");
         return;
     }
+
+    showLoading(resultsDiv);
 
     try {
         const url = `${API_BASE}/customers/by-state?state=${encodeURIComponent(state)}`;
         const res = await fetch(url);
+        
         if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP ${res.status}`);
         }
+        
         const data = await res.json();
-        // backend: beklenen format: [{customer_id, customer_city, customer_state}, ...]
-        renderCustomersByState(data);
+        
+        const columns = [
+            { key: 'customer_id', label: 'Customer ID' },
+            { key: 'customer_city', label: 'City' },
+            { key: 'customer_state', label: 'State' }
+        ];
+        
+        renderTable(resultsDiv, columns, data);
     } catch (err) {
         console.error("Error loading customers by state:", err);
-        setCustomersError("Error loading customers.");
+        showError(resultsDiv, "Error loading customers.");
     }
 }
 
 async function loadTopCities() {
     const limitInput = document.getElementById("customers-limit");
+    const resultsDiv = document.getElementById("customers-results");
+    
+    clearError(resultsDiv);
+    
     let limit = Number(limitInput?.value || 5);
 
     if (!Number.isFinite(limit) || limit < 1 || limit > 50) {
-        setCustomersError("Limit must be between 1 and 50.");
+        showError(resultsDiv, "Limit must be between 1 and 50.");
         return;
     }
+
+    showLoading(resultsDiv);
 
     try {
         const url = `${API_BASE}/customers/top-cities?limit=${encodeURIComponent(limit)}`;
         const res = await fetch(url);
 
         if (!res.ok) {
-            let msg = "Error loading top cities.";
-            try {
-                const body = await res.json();
-                if (body && body.error) msg = body.error;
-            } catch (_) {}
-            throw new Error(msg);
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP ${res.status}`);
         }
 
         const data = await res.json();
-        // backend: [{customer_city, customer_count}, ...]
-        renderTopCities(data);
+        
+        const columns = [
+            { key: 'customer_city', label: 'City' },
+            { key: 'customer_count', label: 'Customer Count' }
+        ];
+        
+        renderTable(resultsDiv, columns, data);
     } catch (err) {
         console.error("Error loading top cities:", err);
-        setCustomersError("Error loading top cities.");
+        showError(resultsDiv, "Error loading top cities.");
     }
 }

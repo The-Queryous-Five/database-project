@@ -1,85 +1,90 @@
-// frontend/js/orders.js
+"use strict";
 
-/**
- * Bu fonksiyon index.html'deki "Siparişleri Getir" butonuna tıklandığında çalışır.
- * Backend API: GET /orders/by-customer/<customer_id>?limit=<limit>
- */
+const API_BASE_ORDERS = "http://127.0.0.1:5000";
+
+// ============ HELPER FUNCTIONS ============
+
+function showLoadingOrders(container) {
+    if (!container) return;
+    container.innerHTML = '<p class="info-message">Loading...</p>';
+}
+
+function showErrorOrders(container, message) {
+    if (!container) return;
+    container.innerHTML = `<p class="error-message">${message}</p>`;
+}
+
+function clearErrorOrders(container) {
+    if (!container) return;
+    container.innerHTML = '';
+}
+
+function renderTableOrders(container, columns, rows) {
+    if (!container) return;
+    
+    if (!rows || rows.length === 0) {
+        container.innerHTML = '<p>No orders found.</p>';
+        return;
+    }
+    
+    let html = '<table><thead><tr>';
+    columns.forEach(col => {
+        html += `<th>${col.label}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    rows.forEach(row => {
+        html += '<tr>';
+        columns.forEach(col => {
+            html += `<td>${row[col.key] ?? ''}</td>`;
+        });
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// ============ API FUNCTIONS ============
+
 async function loadOrdersByCustomer() {
-    // HTML'den gerekli elementleri seçelim
     const resultsDiv = document.getElementById('orders-results');
     const customerIdInput = document.getElementById('orders-customer-id');
     const limitInput = document.getElementById('orders-limit');
 
-    // Değerleri alalım
-    const customerId = customerIdInput.value.trim();
-    const limit = limitInput.value;
+    clearErrorOrders(resultsDiv);
 
-    // 1. Validasyon (Basit kontrol)
+    const customerId = customerIdInput?.value.trim();
+    const limit = limitInput?.value || '5';
+
     if (!customerId) {
-        alert("Lütfen bir Customer ID girin!");
+        showErrorOrders(resultsDiv, "Please enter a Customer ID!");
         return;
     }
 
-    // Yükleniyor mesajı göster
-    resultsDiv.innerHTML = '<p style="color: gray;">Veriler yükleniyor...</p>';
+    showLoadingOrders(resultsDiv);
 
     try {
-        // 2. API İsteği (Backend'in 5000 portunda çalıştığını varsayıyoruz)
-        const url = `http://127.0.0.1:5000/orders/by-customer/${customerId}?limit=${limit}`;
-        console.log("İstek atılıyor:", url); // Hata ayıklama için log
-
+        const url = `${API_BASE_ORDERS}/orders/by-customer/${encodeURIComponent(customerId)}?limit=${encodeURIComponent(limit)}`;
         const response = await fetch(url);
 
-        // Backend hata döndürdüyse (örneğin 422 veya 404)
         if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error || `Bir hata oluştu: ${response.status}`);
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `Error: ${response.status}`);
         }
 
         const data = await response.json();
 
-        // 3. Gelen Veriyi Tabloya Çevirme
-        if (data.length === 0) {
-            resultsDiv.innerHTML = '<p>Bu müşteriye ait sipariş bulunamadı.</p>';
-            return;
-        }
+        const columns = [
+            { key: 'order_id', label: 'Order ID' },
+            { key: 'order_status', label: 'Status' },
+            { key: 'order_purchase_timestamp', label: 'Purchase Date' }
+        ];
 
-        // Tablo başlığı
-        let html = `
-            <div style="overflow-x: auto;">
-                <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; border-color: #ddd; font-family: Arial, sans-serif;">
-                    <thead>
-                        <tr style="background-color: #f2f2f2; text-align: left;">
-                            <th>Order ID</th>
-                            <th>Status</th>
-                            <th>Purchase Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        // Satırları döngüyle ekle
-        data.forEach(order => {
-            html += `
-                <tr>
-                    <td>${order.order_id}</td>
-                    <td>
-                        <span style="padding: 4px 8px; border-radius: 4px; background-color: #e8f5e9; color: #2e7d32;">
-                            ${order.order_status}
-                        </span>
-                    </td>
-                    <td>${order.order_purchase_timestamp}</td>
-                </tr>
-            `;
-        });
-
-        html += '</tbody></table></div>';
-        
-        // Sonucu ekrana bas
-        resultsDiv.innerHTML = html;
+        renderTableOrders(resultsDiv, columns, data);
 
     } catch (error) {
-        console.error("Hata detayı:", error);
-        resultsDiv.innerHTML = `<p style="color: red; font-weight: bold;">Hata: ${error.message}</p>`;
+        console.error("Error details:", error);
+        showErrorOrders(resultsDiv, `Error: ${error.message}`);
     }
 }

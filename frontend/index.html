@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>Olist Analytics Demo</header>
+    <header class="main-header">
+        <h1>Olist Analytics Demo</h1>
+        <p class="header-subtitle">BLG212E Database Management Systems Project - Flask Backend + Frontend UI</p>
+    </header>
 
-    <nav>
+    <nav class="main-nav">
         <a href="#customers-section">Customers</a>
         <a href="#orders-section">Orders</a>
         <a href="#products-section">Products</a>
@@ -17,76 +20,104 @@
         <a href="#reviews-section">Reviews</a>
     </nav>
 
-    <section id="customers-section">
-        <h2>Customers</h2>
-        
-    <div class="form-group">
-        <label>State:</label>
-        <input id="customers-state" placeholder="State (e.g., SP)">
-    </div>
-
-    <div class="form-group">
-        <label>Limit (top cities):</label>
-        <input id="customers-limit" type="number" value="5" min="1" max="50">
-    </div>
-
-    <button onclick="loadCustomersByState()">Get customers by state</button>
-    <button onclick="loadTopCities()">Get top cities</button>
-
-    <h3>Results:</h3>
-    <div id="customers-results" class="results"></div>
-    </section>
-
-    <section id="orders-section" style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px;">
-        <h3>Orders Management </h3>
-        <div class="input-group">
-            <label>Customer ID:</label>
-            <input type="text" id="orders-customer-id" placeholder="Müşteri ID girin">
+    <main class="container">
+        <section id="customers-section" class="card">
+            <h2 class="section-title">Customers</h2>
+            <p class="section-description">Query customer data by state or view top cities by customer count.</p>
             
-            <label>Limit:</label>
-            <input type="number" id="orders-limit" value="5" min="1" max="50">
+            <div class="form-group">
+                <label>State:</label>
+                <input id="customers-state" placeholder="State (e.g., SP)">
+            </div>
+
+            <div class="form-group">
+                <label>Limit (top cities):</label>
+                <input id="customers-limit" type="number" value="5" min="1" max="50">
+            </div>
+
+            <div class="button-group">
+                <button onclick="loadCustomersByState()">Get customers by state</button>
+                <button onclick="loadTopCities()">Get top cities</button>
+            </div>
+
+            <div class="results-container">
+                <h3 class="results-title">Results:</h3>
+                <div id="customers-results" class="results"></div>
+            </div>
+        </section>
+
+        <section id="orders-section" class="card">
+            <h2 class="section-title">Orders</h2>
+            <p class="section-description">List all orders for a specific customer by providing their customer ID.</p>
             
-            <button onclick="loadOrdersByCustomer()">Siparişleri Getir</button>
-        </div>
+            <div class="form-group">
+                <label>Customer ID:</label>
+                <input type="text" id="orders-customer-id" placeholder="Enter customer ID">
+            </div>
+            
+            <div class="form-group">
+                <label>Limit:</label>
+                <input type="number" id="orders-limit" value="5" min="1" max="50">
+            </div>
+            
+            <div class="button-group">
+                <button onclick="loadOrdersByCustomer()">Get orders by customer</button>
+            </div>
 
-        <div id="orders-results" style="margin-top: 20px;"></div>
-    </section>
+            <div class="results-container">
+                <div id="orders-results"></div>
+            </div>
+        </section>
 
-    <section id="products-section">
-        <h2>Products</h2>
-        <p>Products UI will be implemented in a separate task.</p>
-    </section>
+        <section id="products-section" class="card">
+            <h2 class="section-title">Products</h2>
+            <p class="section-description">Browse products by category or view top categories by product count.</p>
+            <!-- Products UI is dynamically injected by products.js -->
+        </section>
 
-    <section id="payments-section">
-        <h2>Payments</h2>
-        <div class="form-group">
-            <label for="payment-type-input">Payment Type:</label>
-            <input id="payment-type-input" type="text" placeholder="payment_type (e.g. credit_card)" value="credit_card">
-            <button id="payments-by-type-btn">Get payments by type</button>
-        </div>
-        <div id="payments-error" class="error"></div>
-        <div id="payments-results"></div>
-    </section>
+        <section id="payments-section" class="card">
+            <h2 class="section-title">Payments</h2>
+            <p class="section-description">Filter payments by payment type (e.g., credit_card, boleto, voucher).</p>
+            
+            <div class="form-group">
+                <label for="payment-type-input">Payment Type:</label>
+                <input id="payment-type-input" type="text" placeholder="payment_type (e.g. credit_card)" value="credit_card">
+            </div>
 
-    <section id="reviews-section">
-        <h2>Reviews</h2>
-        
-        <div class="form-group">
-            <label for="reviews-min-score">Min Score (1-5):</label>
-            <input id="reviews-min-score" type="number" value="1" min="1" max="5">
-        </div>
-        
-        <div class="form-group">
-            <label for="reviews-max-score">Max Score (1-5):</label>
-            <input id="reviews-max-score" type="number" value="5" min="1" max="5">
-        </div>
-        
-        <button onclick="loadReviewStats()">Get review stats</button>
-        
-        <h3>Results:</h3>
-        <div id="reviews-error" class="error"></div>
-        <div id="reviews-results" class="results"></div>
-    </section>
+            <div class="button-group">
+                <button id="payments-by-type-btn">Get payments by type</button>
+            </div>
+            
+            <div id="payments-error" class="error-message"></div>
+            <div class="results-container">
+                <div id="payments-results" class="results"></div>
+            </div>
+        </section>
+
+        <section id="reviews-section" class="card">
+            <h2 class="section-title">Reviews</h2>
+            <p class="section-description">View review statistics filtered by score range (1-5 stars).</p>
+            
+            <div class="form-group">
+                <label for="reviews-min-score">Min Score (1-5):</label>
+                <input id="reviews-min-score" type="number" value="1" min="1" max="5">
+            </div>
+            
+            <div class="form-group">
+                <label for="reviews-max-score">Max Score (1-5):</label>
+                <input id="reviews-max-score" type="number" value="5" min="1" max="5">
+            </div>
+            
+            <div class="button-group">
+                <button onclick="loadReviewStats()">Get review stats</button>
+            </div>
+            
+            <div id="reviews-error" class="error-message"></div>
+            <div class="results-container">
+                <div id="reviews-results" class="results"></div>
+            </div>
+        </section>
+    </main>
 
     <script src="js/customers.js"></script>
     <script src="js/orders.js"></script>

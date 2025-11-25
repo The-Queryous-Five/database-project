@@ -1,5 +1,12 @@
 const BASE_URL = 'http://127.0.0.1:5000';
 
+// ============ HELPER FUNCTIONS ============
+
+function showLoadingProducts(container) {
+  if (!container) return;
+  container.innerHTML = '<p class="info-message">Loading...</p>';
+}
+
 function setMsg(text, isError=false) {
   const el = document.getElementById('products-msg');
   if (!el) return;
@@ -19,11 +26,14 @@ function renderTable(containerId, rows) {
   host.innerHTML = `<table>${thead}${tbody}</table>`;
 }
 
+// ============ API FUNCTIONS ============
+
 // Get products by category
 async function loadProductsByCategory() {
   setMsg('');
   const idEl = document.getElementById('products-category-id');
   const limEl = document.getElementById('products-limit');
+  const resultsEl = document.getElementById('products-results');
   const categoryId = String(idEl?.value || '').trim();
   const limit = Number(limEl?.value || 10);
   
@@ -32,6 +42,7 @@ async function loadProductsByCategory() {
     return; 
   }
 
+  showLoadingProducts(resultsEl);
   const params = new URLSearchParams({ category_id: categoryId, limit: limit });
   const url = `${BASE_URL}/products/by-category?${params.toString()}`;
   
@@ -68,8 +79,10 @@ async function loadProductsByCategory() {
 async function loadTopCategories() {
   setMsg('');
   const limEl = document.getElementById('products-limit');
+  const resultsEl = document.getElementById('products-results');
   const limit = Number(limEl?.value || 10);
 
+  showLoadingProducts(resultsEl);
   const params = new URLSearchParams({ limit: limit });
   const url = `${BASE_URL}/products/top-categories?${params.toString()}`;
   
