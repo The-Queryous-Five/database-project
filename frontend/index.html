@@ -35,6 +35,43 @@
 
     <h3>Results:</h3>
     <div id="customers-results" class="results"></div>
+
+    <!-- Geo Analytics Section -->
+    <div style="margin-top: 40px; border-top: 2px solid #ccc; padding-top: 20px;">
+        <h3>Geo Analytics</h3>
+        
+        <!-- Customers by City Form -->
+        <div style="margin-bottom: 30px;">
+            <h4>Customers by City</h4>
+            <div class="form-group">
+                <label>State:</label>
+                <input id="customers-by-city-state" placeholder="SP" type="text">
+            </div>
+            <div class="form-group">
+                <label>City:</label>
+                <input id="customers-by-city-city" placeholder="sao_paulo" type="text">
+            </div>
+            <div class="form-group">
+                <label>Limit:</label>
+                <input id="customers-by-city-limit" type="number" value="10" min="1" max="50">
+            </div>
+            <button onclick="handleCustomersByCitySubmit()">Get customers by city</button>
+            <button onclick="handleCustomersByCityDemo()">Use demo values</button>
+            <div id="customers-by-city-results" class="results" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Top States Form -->
+        <div>
+            <h4>Top States by Customer Count</h4>
+            <div class="form-group">
+                <label>Limit:</label>
+                <input id="geo-top-states-limit" type="number" value="10" min="1" max="27">
+            </div>
+            <button onclick="handleGeoTopStatesSubmit()">Get top states</button>
+            <button onclick="handleGeoTopStatesDemo()">Use demo values</button>
+            <div id="geo-top-states-results" class="results" style="margin-top: 15px;"></div>
+        </div>
+    </div>
     </section>
 
     <section id="orders-section" style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px;">
@@ -52,10 +89,49 @@
         <div id="orders-results" style="margin-top: 20px;"></div>
     </section>
 
-    <section id="products-section">
-        <h2>Products</h2>
-        <p>Products UI will be implemented in a separate task.</p>
-    </section>
+<section id="products-section" class="module-card">
+  <div class="module-header">
+    <h2>Products</h2>
+    <p class="module-subtitle">
+      Filter products by category or preview our top-selling categories.
+    </p>
+  </div>
+
+  <div class="module-grid">
+    <div class="module-form">
+      <label class="field">
+        <span>Category ID</span>
+        <input id="products-category-id" type="number" placeholder="e.g. 21">
+      </label>
+
+      <label class="field">
+        <span>Limit</span>
+        <input id="products-limit" type="number" value="10" min="1" max="100">
+      </label>
+
+      <div class="buttons-row">
+        <button id="btn-products-by-category" class="btn primary">
+          Get products by category
+        </button>
+        <button id="btn-top-categories" class="btn secondary">
+          Show top categories
+        </button>
+      </div>
+
+      <p class="hint">
+        Tip: For demo, try <strong>category 21</strong> with limit <strong>10</strong>.
+      </p>
+
+      <div id="products-msg" class="msg"></div>
+    </div>
+
+    <div class="module-results">
+      <h3>Results</h3>
+      <div id="products-results" class="results"></div>
+    </div>
+  </div>
+</section>
+
 
     <section id="payments-section">
         <h2>Payments</h2>
