@@ -26,8 +26,6 @@ function renderTable(containerId, rows) {
   host.innerHTML = `<table>${thead}${tbody}</table>`;
 }
 
-// ============ API FUNCTIONS ============
-
 // Get products by category
 async function loadProductsByCategory() {
   setMsg('');

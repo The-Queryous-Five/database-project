@@ -333,3 +333,105 @@ button.demo-btn:hover {
         width: 100%;
     }
 }
+
+/* ----- Products module custom styling (Mert) ----- */
+
+.module-card {
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-top: 24px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.module-header h2 {
+  margin: 0;
+}
+
+.module-subtitle {
+  margin: 4px 0 16px;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.field span {
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.field input {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0 4px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.btn.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.module-results h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+#products-results table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#products-results th,
+#products-results td {
+  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+}
+
+#products-results th {
+  background: #f3f4f6;
+}
+
