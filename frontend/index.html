@@ -35,6 +35,43 @@
 
     <h3>Results:</h3>
     <div id="customers-results" class="results"></div>
+
+    <!-- Geo Analytics Section -->
+    <div style="margin-top: 40px; border-top: 2px solid #ccc; padding-top: 20px;">
+        <h3>Geo Analytics</h3>
+        
+        <!-- Customers by City Form -->
+        <div style="margin-bottom: 30px;">
+            <h4>Customers by City</h4>
+            <div class="form-group">
+                <label>State:</label>
+                <input id="customers-by-city-state" placeholder="SP" type="text">
+            </div>
+            <div class="form-group">
+                <label>City:</label>
+                <input id="customers-by-city-city" placeholder="sao_paulo" type="text">
+            </div>
+            <div class="form-group">
+                <label>Limit:</label>
+                <input id="customers-by-city-limit" type="number" value="10" min="1" max="50">
+            </div>
+            <button onclick="handleCustomersByCitySubmit()">Get customers by city</button>
+            <button onclick="handleCustomersByCityDemo()">Use demo values</button>
+            <div id="customers-by-city-results" class="results" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Top States Form -->
+        <div>
+            <h4>Top States by Customer Count</h4>
+            <div class="form-group">
+                <label>Limit:</label>
+                <input id="geo-top-states-limit" type="number" value="10" min="1" max="27">
+            </div>
+            <button onclick="handleGeoTopStatesSubmit()">Get top states</button>
+            <button onclick="handleGeoTopStatesDemo()">Use demo values</button>
+            <div id="geo-top-states-results" class="results" style="margin-top: 15px;"></div>
+        </div>
+    </div>
     </section>
 
     <section id="orders-section" style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px;">
