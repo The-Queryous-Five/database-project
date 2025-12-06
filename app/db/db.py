@@ -61,7 +61,8 @@ def get_conn():
                 "port": DB_CFG["port"],
                 "database": DB_CFG["dbname"],
                 "user": DB_CFG["user"],
-                "password": DB_CFG["password"]
+                "password": DB_CFG["password"],
+                "autocommit": True  # Enable autocommit for MySQL
             }
             logger.info(f"Connecting to MySQL: {conn_params['user']}@{conn_params['host']}:{conn_params['port']}/{conn_params['database']}")
             return mysql.connector.connect(**conn_params)

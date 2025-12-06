@@ -5,7 +5,7 @@
  * Week 4 Task: Display review stats filtered by score range (1-5)
  */
 
-const API_BASE_URL = "http://127.0.0.1:5000";
+const API_BASE_URL = "http://127.0.0.1:5001";
 
 /**
  * Load review statistics based on min_score and max_score

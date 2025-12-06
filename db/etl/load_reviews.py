@@ -26,10 +26,10 @@ def load_reviews(csv_path: str):  # olist_order_reviews_dataset.csv
     checks orphans, and tightens NOT NULL if safe.
     """
     insert_sql = (
-        "INSERT INTO order_reviews(review_id, order_id, review_score, review_comment_message, review_creation_date) "
-        "VALUES (%s,%s,%s,%s,%s) ON CONFLICT (review_id) DO NOTHING"
+        "INSERT IGNORE INTO order_reviews(review_id, order_id, review_score, review_comment_message, review_creation_date) "
+        "VALUES (%s,%s,%s,%s,%s)"
     )
-    with open(csv_path, newline='', encoding='utf-8') as f, get_conn() as conn, conn.cursor() as cur:
+    with open(csv_path, newline='', encoding='utf-8-sig') as f, get_conn() as conn, conn.cursor() as cur:
         reader = csv.DictReader(f)
         def to_int(x: Optional[str]):
             try:
@@ -59,9 +59,9 @@ def load_reviews(csv_path: str):  # olist_order_reviews_dataset.csv
         cur.execute(
             """
             UPDATE order_reviews r
-            SET customer_id = o.customer_id
-            FROM orders o
-            WHERE r.customer_id IS NULL AND r.order_id = o.order_id
+            JOIN orders o ON r.order_id = o.order_id
+            SET r.customer_id = o.customer_id
+            WHERE r.customer_id IS NULL
             """
         )
         # Orphan check (customer_id still NULL?)
@@ -70,7 +70,7 @@ def load_reviews(csv_path: str):  # olist_order_reviews_dataset.csv
         print(f"order_reviews.customer_id NULL count: {orphans}")
         if orphans == 0:
             print("Tightening NOT NULL on order_reviews.customer_id...")
-            cur.execute("ALTER TABLE order_reviews ALTER COLUMN customer_id SET NOT NULL")
+            cur.execute("ALTER TABLE order_reviews MODIFY customer_id VARCHAR(255) NOT NULL")
         else:
             print("Skipping NOT NULL alter due to remaining NULLs.")
 

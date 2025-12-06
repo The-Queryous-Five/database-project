@@ -1,18 +1,65 @@
 from flask import Blueprint, request, jsonify
 from app.db import db
-from psycopg import OperationalError  # DB hatasını yakalamak için
+from psycopg import OperationalError
+import logging
+
+logger = logging.getLogger(__name__)
 
 bp_customers = Blueprint("customers", __name__)
 bp_geo = Blueprint("geo", __name__)
 
-@bp_customers.get("/customers/by-state")
-def customers_by_state():
-    state = request.args.get("state")
-    if not state:
-        return jsonify({"error": "Missing required parameter: state"}), 400
 
-    # Şimdilik dummy cevap (Week 1’deki gibi)
-    return jsonify({"state": state, "total_customers": 0})
+@bp_customers.get("/customers/by-state/<string:state>")
+def customers_by_state(state):
+    """Get customers by state code with optional limit."""
+    limit_str = request.args.get("limit", "10")
+    
+    # Validate state
+    if not state or not state.strip():
+        return jsonify({"error": "State code cannot be empty"}), 400
+    
+    if len(state) > 2:
+        return jsonify({"error": "State code must be 2 characters"}), 400
+    
+    # Validate limit
+    try:
+        limit = int(limit_str)
+        if not (1 <= limit <= 100):
+            return jsonify({"error": "limit must be between 1 and 100"}), 400
+    except ValueError:
+        return jsonify({"error": "limit must be a valid integer"}), 400
+    
+    try:
+        sql = """
+        SELECT 
+            customer_id,
+            customer_city,
+            customer_state
+        FROM customers
+        WHERE UPPER(customer_state) = UPPER(%s)
+        ORDER BY customer_city
+        LIMIT %s
+        """
+        
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (state, limit))
+                rows = cur.fetchall()
+        
+        customers = [
+            {
+                "customer_id": row[0],
+                "customer_city": row[1],
+                "customer_state": row[2]
+            }
+            for row in rows
+        ]
+        
+        return jsonify(customers), 200
+    
+    except Exception as e:
+        logger.error(f"Error fetching customers by state: {e}")
+        return jsonify({"error": "Database error occurred"}), 500
 
 
 def get_top_cities(limit: int = 5):
@@ -46,7 +93,6 @@ def customers_top_cities():
         rows = get_top_cities(limit)
         return jsonify(rows)
     except OperationalError:
-        # Postgres ayakta değilse buraya düşer
         return jsonify({"error": "database not available (top-cities)"}), 503
 
 

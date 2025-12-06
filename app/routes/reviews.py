@@ -9,14 +9,12 @@ bp_reviews = Blueprint("reviews", __name__, url_prefix="/reviews")
 
 @bp_reviews.get("/stats")
 def reviews_stats():
-    """Get review statistics filtered by score range."""
-    min_score_str = request.args.get("min_score")
-    max_score_str = request.args.get("max_score")
+    """Get review statistics including score distribution and averages."""
+    # Make parameters optional for dashboard use
+    min_score_str = request.args.get("min_score", "1")
+    max_score_str = request.args.get("max_score", "5")
     
     # Validate min_score
-    if not min_score_str:
-        return jsonify({"error": "Missing required parameter: min_score"}), 400
-    
     try:
         min_score = int(min_score_str)
         if not (1 <= min_score <= 5):
@@ -25,9 +23,6 @@ def reviews_stats():
         return jsonify({"error": "min_score must be a valid integer"}), 400
     
     # Validate max_score
-    if not max_score_str:
-        return jsonify({"error": "Missing required parameter: max_score"}), 400
-    
     try:
         max_score = int(max_score_str)
         if not (1 <= max_score <= 5):
@@ -40,10 +35,19 @@ def reviews_stats():
         return jsonify({"error": "max_score must be greater than or equal to min_score"}), 400
     
     try:
-        sql = """
+        # Get overall stats
+        overall_sql = """
+        SELECT 
+            COUNT(*) as total_reviews,
+            AVG(review_score) as avg_score
+        FROM order_reviews
+        """
+        
+        # Get score distribution
+        dist_sql = """
         SELECT 
             review_score,
-            COUNT(*) AS review_count
+            COUNT(*) AS count
         FROM order_reviews
         WHERE review_score BETWEEN %s AND %s
         GROUP BY review_score
@@ -52,34 +56,79 @@ def reviews_stats():
         
         with db.get_conn() as conn:
             with conn.cursor() as cur:
-                cur.execute(sql, (min_score, max_score))
-                rows = cur.fetchall()
+                # Get overall stats
+                cur.execute(overall_sql)
+                overall_row = cur.fetchone()
+                
+                # Get distribution
+                cur.execute(dist_sql, (min_score, max_score))
+                dist_rows = cur.fetchall()
         
-        stats = [
-            {
-                "review_score": row[0],
-                "review_count": row[1]
-            }
-            for row in rows
-        ]
-        
-        # Calculate totals
-        total_reviews = sum(item["review_count"] for item in stats)
-        
-        if total_reviews > 0:
-            weighted_sum = sum(item["review_score"] * item["review_count"] for item in stats)
-            average_score = weighted_sum / total_reviews
-        else:
-            average_score = None
+        score_distribution = []
+        for row in dist_rows:
+            score_distribution.append({
+                "score": int(row[0]),
+                "count": int(row[1])
+            })
         
         return jsonify({
-            "min_score": min_score,
-            "max_score": max_score,
-            "total_reviews": total_reviews,
-            "average_score": round(average_score, 2) if average_score is not None else None,
-            "stats": stats
-        })
+            "total_reviews": int(overall_row[0]) if overall_row[0] else 0,
+            "avg_score": float(overall_row[1]) if overall_row[1] else 0.0,
+            "score_distribution": score_distribution
+        }), 200
     
     except Exception as e:
         logger.error(f"Error fetching review stats: {e}")
         return jsonify({"error": "Database error occurred"}), 500
+
+
+@bp_reviews.get("/recent")
+def get_recent_reviews():
+    """
+    Get recent reviews with optional limit.
+    GET /reviews/recent?limit=20
+    """
+    limit_str = request.args.get('limit', '20')
+    
+    try:
+        limit = int(limit_str)
+        if not (1 <= limit <= 100):
+            return jsonify({"error": "limit must be between 1 and 100"}), 422
+    except ValueError:
+        return jsonify({"error": "limit must be a valid integer"}), 422
+    
+    try:
+        sql = """
+        SELECT 
+            review_id,
+            order_id,
+            review_score,
+            review_comment_message,
+            review_creation_date
+        FROM order_reviews
+        ORDER BY review_creation_date DESC
+        LIMIT %s
+        """
+        
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (limit,))
+                rows = cur.fetchall()
+                
+                reviews = []
+                for row in rows:
+                    reviews.append({
+                        "review_id": row[0],
+                        "order_id": row[1],
+                        "review_score": int(row[2]) if row[2] else 0,
+                        "review_comment_title": None,  # Not available in schema
+                        "review_comment_message": row[3],
+                        "review_creation_date": row[4].isoformat() if row[4] else None,
+                        "review_answer_timestamp": None  # Not available in schema
+                    })
+                
+                return jsonify(reviews), 200
+                    
+    except Exception as e:
+        logger.error(f"Error fetching recent reviews: {e}")
+        return jsonify({"error": "Failed to fetch recent reviews"}), 500
