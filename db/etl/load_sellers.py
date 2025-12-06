@@ -22,10 +22,10 @@ def _iter_batches(rows: Iterable[Tuple], batch_size: int = BATCH_SIZE):
 
 def load_sellers(csv_path: str):  # olist_sellers_dataset.csv
     sql = (
-        "INSERT INTO sellers(seller_id, seller_zip_code_prefix, seller_city, seller_state) "
-        "VALUES (%s,%s,%s,%s) ON CONFLICT (seller_id) DO NOTHING"
+        "INSERT IGNORE INTO sellers(seller_id, seller_zip_code_prefix, seller_city, seller_state) "
+        "VALUES (%s,%s,%s,%s)"
     )
-    with open(csv_path, newline='', encoding='utf-8') as f, get_conn() as conn, conn.cursor() as cur:
+    with open(csv_path, newline='', encoding='utf-8-sig') as f, get_conn() as conn, conn.cursor() as cur:
         reader = csv.DictReader(f)
         def to_int(x: Optional[str]):
             try:

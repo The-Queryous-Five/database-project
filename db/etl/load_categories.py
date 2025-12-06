@@ -16,7 +16,7 @@ def load_categories(csv_path: str):  # product_category_name_translation.csv
     """
     DRY_RUN = get_env_bool("DRY_RUN")
 
-    with open(csv_path, newline='', encoding='utf-8') as f:
+    with open(csv_path, newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f)
         def gen_rows():
             for row in reader:
@@ -34,10 +34,19 @@ def load_categories(csv_path: str):  # product_category_name_translation.csv
 
         # Real DB insert
         from app.db.db import get_conn
-        sql = (
-            "INSERT INTO categories(category_name, category_name_english) "
-            "VALUES (%s, %s) ON CONFLICT (category_name) DO NOTHING"
-        )
+        from app.config import DB_CFG
+        
+        vendor = DB_CFG.get("vendor", "postgres")
+        if vendor == "mysql":
+            sql = (
+                "INSERT IGNORE INTO categories(category_name, category_name_english) "
+                "VALUES (%s, %s)"
+            )
+        else:
+            sql = (
+                "INSERT INTO categories(category_name, category_name_english) "
+                "VALUES (%s, %s) ON CONFLICT (category_name) DO NOTHING"
+            )
         with get_conn() as conn, conn.cursor() as cur:
             total = 0
             for batch in iter_batches(all_rows, BATCH_SIZE):

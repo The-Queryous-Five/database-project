@@ -50,10 +50,10 @@ def load_order_items(csv_path: str):  # olist_order_items_dataset.csv
     # Orijinal kod (DRY_RUN = 0 ise buradan devam eder)
     print("DRY_RUN=0. Connecting to database for real load...")
     sql = (
-        "INSERT INTO order_items(order_id, order_item_id, product_id, seller_id, shipping_limit_date, price, freight_value) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (order_id, order_item_id) DO NOTHING"
+        "INSERT IGNORE INTO order_items(order_id, order_item_id, product_id, seller_id, shipping_limit_date, price, freight_value) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s)"
     )
-    with open(csv_path, newline='', encoding='utf-8') as f, get_conn() as conn, conn.cursor() as cur:
+    with open(csv_path, newline='', encoding='utf-8-sig') as f, get_conn() as conn, conn.cursor() as cur:
         reader = csv.DictReader(f)
         def to_int(x: Optional[str]):
             try:

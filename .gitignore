@@ -3,3 +3,7 @@
 __pycache__/
 .vscode/
 .DS_Store
+venv/
+*.log
+flask.log
+olist-dashboard/

@@ -86,7 +86,8 @@ def get_conn():
                 "port": port,
                 "database": dbname,
                 "user": user,
-                "password": password
+                "password": password,
+                "autocommit": True  # Enable autocommit for MySQL
             }
             
             conn = mysql.connector.connect(**conn_params)
