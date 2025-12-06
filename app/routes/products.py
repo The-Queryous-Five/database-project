@@ -138,3 +138,91 @@ def products_top_categories():
     except Exception as e:
         logger.error(f"Error fetching top categories: {e}")
         return jsonify({"error": "Database error occurred"}), 500
+
+
+@products_bp.get("/stats")
+def get_product_stats():
+    """
+    Get product statistics including total products and categories.
+    GET /products/stats
+    """
+    try:
+        sql = """
+        SELECT 
+            COUNT(DISTINCT p.product_id) as total_products,
+            COUNT(DISTINCT p.category_id) as total_categories
+        FROM products p
+        """
+        
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                row = cur.fetchone()
+                
+                if row:
+                    return jsonify({
+                        "total_products": int(row[0]) if row[0] else 0,
+                        "total_categories": int(row[1]) if row[1] else 0
+                    }), 200
+                else:
+                    return jsonify({"error": "No data available"}), 404
+                    
+    except Exception as e:
+        logger.error(f"Error fetching product stats: {e}")
+        return jsonify({"error": "Failed to fetch product statistics"}), 500
+
+
+@products_bp.get("")
+def get_products():
+    """
+    Get products with optional limit.
+    GET /products?limit=50
+    """
+    limit_str = request.args.get('limit', '50')
+    
+    try:
+        limit = int(limit_str)
+        if not (1 <= limit <= 500):
+            return jsonify({"error": "limit must be between 1 and 500"}), 422
+    except ValueError:
+        return jsonify({"error": "limit must be a valid integer"}), 422
+    
+    try:
+        sql = """
+        SELECT 
+            p.product_id,
+            p.product_category_name,
+            p.product_photos_qty,
+            p.product_weight_g,
+            p.product_length_cm,
+            p.product_height_cm,
+            p.product_width_cm
+        FROM products p
+        ORDER BY p.product_id
+        LIMIT %s
+        """
+        
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (limit,))
+                rows = cur.fetchall()
+                
+                products = []
+                for row in rows:
+                    products.append({
+                        "product_id": row[0],
+                        "product_category_name": row[1],
+                        "product_name_length": 0,  # Not available in schema
+                        "product_description_length": 0,  # Not available in schema
+                        "product_photos_qty": row[2],
+                        "product_weight_g": row[3],
+                        "product_length_cm": row[4],
+                        "product_height_cm": row[5],
+                        "product_width_cm": row[6]
+                    })
+                
+                return jsonify(products), 200
+                    
+    except Exception as e:
+        logger.error(f"Error fetching products: {e}")
+        return jsonify({"error": "Failed to fetch products"}), 500

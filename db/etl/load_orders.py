@@ -53,10 +53,10 @@ def load_orders(csv_path: str):  # olist_orders_dataset.csv
     # Orijinal kod (DRY_RUN = 0 ise buradan devam eder)
     print("DRY_RUN=0. Connecting to database for real load...")
     sql = (
-        "INSERT INTO orders(order_id, customer_id, order_status, order_purchase_timestamp, order_estimated_delivery_date) "
-        "VALUES (%s,%s,%s,%s,%s) ON CONFLICT (order_id) DO NOTHING"
+        "INSERT IGNORE INTO orders(order_id, customer_id, order_status, order_purchase_timestamp, order_estimated_delivery_date) "
+        "VALUES (%s,%s,%s,%s,%s)"
     )
-    with open(csv_path, newline='', encoding='utf-8') as f, get_conn() as conn, conn.cursor() as cur:
+    with open(csv_path, newline='', encoding='utf-8-sig') as f, get_conn() as conn, conn.cursor() as cur:
         reader = csv.DictReader(f)
         def gen_rows():
             for row in reader:

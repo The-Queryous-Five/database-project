@@ -1,6 +1,6 @@
 "use strict";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "http://127.0.0.1:5001";
 
 /**
  * Render payments by type result in the container
@@ -99,5 +99,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Attach event listener
     button.addEventListener("click", onPaymentsByTypeClick);
+    
+    // Demo button handler
+    const demoBtn = document.getElementById("payments-demo-btn");
+    if (demoBtn) {
+        demoBtn.addEventListener("click", () => {
+            if (typeInput) typeInput.value = "credit_card";
+            
+            // Auto-trigger the query
+            onPaymentsByTypeClick();
+        });
+    }
+    
     console.log("payments.js loaded - ready to fetch payment data");
 });
