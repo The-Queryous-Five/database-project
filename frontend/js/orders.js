@@ -24,8 +24,8 @@ async function loadOrdersByCustomer() {
     resultsDiv.innerHTML = '<p style="color: gray;">Veriler yükleniyor...</p>';
 
     try {
-        // 2. API İsteği (Backend'in 5000 portunda çalıştığını varsayıyoruz)
-        const url = `http://127.0.0.1:5000/orders/by-customer/${customerId}?limit=${limit}`;
+        // 2. API İsteği (Backend'in 5001 portunda çalıştığını varsayıyoruz)
+        const url = `http://127.0.0.1:5001/orders/by-customer/${customerId}?limit=${limit}`;
         console.log("İstek atılıyor:", url); // Hata ayıklama için log
 
         const response = await fetch(url);

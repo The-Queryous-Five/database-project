@@ -71,3 +71,60 @@ def payments_by_type():
     except Exception as e:
         logger.error(f"Error fetching payments by type: {e}")
         return jsonify({"error": "Database error occurred"}), 500
+
+
+@bp_payments.get("/stats")
+def get_payment_stats():
+    """
+    Get payment statistics including totals, averages, and payment type breakdown.
+    GET /payments/stats
+    """
+    try:
+        # Get overall stats
+        stats_sql = """
+        SELECT 
+            COUNT(*) as total_payments,
+            SUM(payment_value) as total_value,
+            AVG(payment_value) as avg_payment_value
+        FROM order_payments
+        """
+        
+        # Get payment type breakdown
+        types_sql = """
+        SELECT 
+            payment_type,
+            COUNT(*) as count,
+            SUM(payment_value) as total
+        FROM order_payments
+        GROUP BY payment_type
+        ORDER BY count DESC
+        """
+        
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                # Get overall stats
+                cur.execute(stats_sql)
+                stats_row = cur.fetchone()
+                
+                # Get payment types
+                cur.execute(types_sql)
+                type_rows = cur.fetchall()
+                
+                payment_types = []
+                for row in type_rows:
+                    payment_types.append({
+                        "type": row[0],
+                        "count": int(row[1]),
+                        "total": float(row[2]) if row[2] else 0.0
+                    })
+                
+                return jsonify({
+                    "total_payments": int(stats_row[0]) if stats_row[0] else 0,
+                    "total_value": float(stats_row[1]) if stats_row[1] else 0.0,
+                    "avg_payment_value": float(stats_row[2]) if stats_row[2] else 0.0,
+                    "payment_types": payment_types
+                }), 200
+                    
+    except Exception as e:
+        logger.error(f"Error fetching payment stats: {e}")
+        return jsonify({"error": "Failed to fetch payment statistics"}), 500

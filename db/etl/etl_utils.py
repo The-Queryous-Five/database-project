@@ -16,12 +16,38 @@ def get_env_bool(key: str, default: bool = False) -> bool:
     return default
 
 
+def get_insert_ignore_sql(table: str, columns: str, placeholders: str, conflict_column: str = None) -> str:
+    """
+    Generate INSERT IGNORE/ON CONFLICT SQL based on DB vendor.
+    
+    Args:
+        table: Table name
+        columns: Column names (e.g., "col1, col2")
+        placeholders: Value placeholders (e.g., "%s, %s")
+        conflict_column: Column(s) for conflict resolution (optional)
+    
+    Returns:
+        SQL string appropriate for the current DB vendor
+    """
+    from app.config import DB_CFG
+    vendor = DB_CFG.get("vendor", "postgres")
+    
+    if vendor == "mysql":
+        return f"INSERT IGNORE INTO {table}({columns}) VALUES ({placeholders})"
+    else:  # postgres
+        if conflict_column:
+            return f"INSERT INTO {table}({columns}) VALUES ({placeholders}) ON CONFLICT ({conflict_column}) DO NOTHING"
+        else:
+            return f"INSERT INTO {table}({columns}) VALUES ({placeholders})"
+
+
 def read_csv_in_batches(csv_path: str, batch_size: int = 5000) -> Iterable[List[dict]]:
     """
     Read CSV file in batches.
     Yields batches of dictionaries.
+    Uses utf-8-sig to handle BOM if present.
     """
-    with open(csv_path, newline='', encoding='utf-8') as f:
+    with open(csv_path, newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f)
         batch: List[dict] = []
         for row in reader:
