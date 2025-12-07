@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Customers - Olist Analytics{% endblock %}
+
+{% block content %}
+<h1>Customers List</h1>
+<p>Showing up to 200 customers, ordered by state and city.</p>
+
+{% if customers %}
+<table>
+    <thead>
+        <tr>
+            <th>Customer ID</th>
+            <th>Unique ID</th>
+            <th>City</th>
+            <th>State</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.customer_id }}</td>
+            <td>{{ customer.customer_unique_id }}</td>
+            <td>{{ customer.customer_city }}</td>
+            <td>{{ customer.customer_state }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No customers found.</p>
+{% endif %}
+{% endblock %}
+
