@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from app.db import db
 from psycopg import OperationalError
 import logging
@@ -187,3 +187,36 @@ def geo_top_states():
         return jsonify({"error": "database not available (top-states)"}), 503
     except Exception as e:
         return jsonify({"error": f"database error: {str(e)}"}), 503
+
+
+@bp_customers.get("/customers/ui")
+def customers_ui():
+    """Render customers list UI page with raw SQL query."""
+    try:
+        # Raw SQL query using cursor.execute - NO ORM
+        sql = """
+        SELECT 
+            customer_id,
+            customer_unique_id,
+            customer_city,
+            customer_state
+        FROM customers
+        ORDER BY customer_state, customer_city
+        LIMIT 200
+        """
+        
+        with db.get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                cols = [d[0] for d in cur.description]
+                rows = cur.fetchall()
+        
+        # Convert rows to dictionaries for template
+        customers = [dict(zip(cols, row)) for row in rows]
+        
+        return render_template("customers/list.html", customers=customers)
+    
+    except Exception as e:
+        logger.error(f"Error fetching customers for UI: {e}")
+        # Return template with empty list on error
+        return render_template("customers/list.html", customers=[]), 500
