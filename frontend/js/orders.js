@@ -1,6 +1,6 @@
 "use strict";
 
-const API_BASE_ORDERS = "http://127.0.0.1:5001";
+const API_BASE_ORDERS = window.API_BASE_URL;
 
 // ============ HELPER FUNCTIONS ============
 
