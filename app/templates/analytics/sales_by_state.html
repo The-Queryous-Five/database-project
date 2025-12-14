@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Sales by State - Olist Analytics{% endblock %}
+
+{% block content %}
+<h1>Sales Analytics by State</h1>
+<p>Complex query using 4+ tables (customers, orders, order_items, order_payments) with JOINs, GROUP BY, and aggregate functions.</p>
+
+{% if error %}
+<div style="background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    Error: {{ error }}
+</div>
+{% endif %}
+
+{% if results %}
+<table>
+    <thead>
+        <tr>
+            <th>State</th>
+            <th>Total Orders</th>
+            <th>Total Items</th>
+            <th>Total Payment Value</th>
+            <th>Avg Payment Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in results %}
+        <tr>
+            <td>{{ row.customer_state or 'N/A' }}</td>
+            <td>{{ row.total_orders }}</td>
+            <td>{{ row.total_items }}</td>
+            <td>R$ {{ "%.2f"|format(row.total_payment_value) if row.total_payment_value else '0.00' }}</td>
+            <td>R$ {{ "%.2f"|format(row.avg_payment_value) if row.avg_payment_value else '0.00' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No data available.</p>
+{% endif %}
+{% endblock %}
