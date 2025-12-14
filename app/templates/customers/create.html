@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Create Customer - Olist Analytics{% endblock %}
+
+{% block content %}
+<h1>Create New Customer</h1>
+
+{% if error %}
+<div style="background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('customers.customers_create_post') }}" style="max-width: 600px;">
+    <div style="margin-bottom: 15px;">
+        <label for="customer_id" style="display: block; margin-bottom: 5px; font-weight: 600;">Customer ID *</label>
+        <input type="text" id="customer_id" name="customer_id" required 
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"
+               value="{{ request.form.customer_id if request.form else '' }}">
+    </div>
+    
+    <div style="margin-bottom: 15px;">
+        <label for="customer_unique_id" style="display: block; margin-bottom: 5px; font-weight: 600;">Customer Unique ID *</label>
+        <input type="text" id="customer_unique_id" name="customer_unique_id" required
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"
+               value="{{ request.form.customer_unique_id if request.form else '' }}">
+    </div>
+    
+    <div style="margin-bottom: 15px;">
+        <label for="customer_zip_code_prefix" style="display: block; margin-bottom: 5px; font-weight: 600;">Zip Code Prefix</label>
+        <input type="number" id="customer_zip_code_prefix" name="customer_zip_code_prefix"
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"
+               value="{{ request.form.customer_zip_code_prefix if request.form else '' }}">
+    </div>
+    
+    <div style="margin-bottom: 15px;">
+        <label for="customer_city" style="display: block; margin-bottom: 5px; font-weight: 600;">City</label>
+        <input type="text" id="customer_city" name="customer_city"
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"
+               value="{{ request.form.customer_city if request.form else '' }}">
+    </div>
+    
+    <div style="margin-bottom: 15px;">
+        <label for="customer_state" style="display: block; margin-bottom: 5px; font-weight: 600;">State</label>
+        <input type="text" id="customer_state" name="customer_state"
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"
+               value="{{ request.form.customer_state if request.form else '' }}">
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button type="submit" style="background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+            Create Customer
+        </button>
+        <a href="{{ url_for('customers.customers_ui') }}" style="margin-left: 10px; color: #667eea; text-decoration: none;">Cancel</a>
+    </div>
+</form>
+{% endblock %}
