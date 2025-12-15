@@ -1,153 +1,102 @@
-const BASE_URL = window.API_BASE_URL;
+/**
+ * Products tab – uses /products/by-category and /products/top-categories
+ */
 
-// ============ HELPER FUNCTIONS ============
+const PRODUCTS_API_BASE_URL = typeof API_BASE_URL !== 'undefined'
+  ? API_BASE_URL
+  : 'http://127.0.0.1:5000';
 
-function showLoadingProducts(container) {
-  if (!container) return;
-  container.innerHTML = '<p class="info-message">Loading...</p>';
-}
-
-function setMsg(text, isError=false) {
+function setProductsMsg(text, isError = false) {
   const el = document.getElementById('products-msg');
   if (!el) return;
   el.textContent = text || '';
-  el.style.color = isError ? 'crimson' : 'inherit';
+  el.style.color = isError ? 'red' : '#333';
 }
 
-function renderTable(containerId, rows) {
-  const host = document.getElementById(containerId);
-  if (!host) return;
-  if (!rows || rows.length === 0) { host.innerHTML = '<p>No data.</p>'; return; }
-  const cols = Object.keys(rows[0]);
-  const thead = '<thead><tr>' + cols.map(c=>`<th>${c}</th>`).join('') + '</tr></thead>';
-  const tbody = '<tbody>' + rows.map(r=>(
-    '<tr>' + cols.map(c=>`<td>${r[c] ?? ''}</td>`).join('') + '</tr>'
-  )).join('') + '</tbody>';
-  host.innerHTML = `<table>${thead}${tbody}</table>`;
+function renderProductsTable(rows) {
+  const container = document.getElementById('products-results');
+  if (!container) return;
+
+  if (!rows || rows.length === 0) {
+    container.innerHTML = '<p>No data.</p>';
+    return;
+  }
+
+  const columns = Object.keys(rows[0]);
+
+  const thead = '<tr>' + columns.map(c => `<th>${c}</th>`).join('') + '</tr>';
+  const tbody = rows.map(row =>
+    '<tr>' +
+      columns.map(c => `<td>${row[c] ?? ''}</td>`).join('') +
+    '</tr>'
+  ).join('');
+
+  container.innerHTML = `
+    <table>
+      <thead>${thead}</thead>
+      <tbody>${tbody}</tbody>
+    </table>
+  `;
 }
 
-// Get products by category
 async function loadProductsByCategory() {
-  setMsg('');
-  const idEl = document.getElementById('products-category-id');
-  const limEl = document.getElementById('products-limit');
-  const resultsEl = document.getElementById('products-results');
-  const categoryId = String(idEl?.value || '').trim();
-  const limit = Number(limEl?.value || 10);
-  
-  if (!categoryId) { 
-    setMsg('Please enter category_id', true); 
-    return; 
+  setProductsMsg('');
+  const idInput = document.getElementById('products-category-id');
+  const limitInput = document.getElementById('products-limit');
+
+  if (!idInput || !limitInput) return;
+
+  const categoryId = idInput.value.trim();
+  const limit = limitInput.value.trim() || '10';
+
+  if (!categoryId) {
+    setProductsMsg('Category ID gerekli.', true);
+    return;
   }
 
-  showLoadingProducts(resultsEl);
-  const params = new URLSearchParams({ category_id: categoryId, limit: limit });
-  const url = `${BASE_URL}/products/by-category?${params.toString()}`;
-  
   try {
+    const url = `${PRODUCTS_API_BASE_URL}/products/by-category/${encodeURIComponent(categoryId)}?limit=${encodeURIComponent(limit)}`;
     const resp = await fetch(url);
-    
-    if (resp.status === 400 || resp.status === 422) {
-      const errorData = await resp.json();
-      setMsg(errorData.error || 'Validation error', true);
-      return;
-    }
-    
+
     if (!resp.ok) {
-      const text = await resp.text();
-      setMsg(`Request failed (${resp.status}): ${text}`, true);
+      setProductsMsg(`Backend error (${resp.status}).`, true);
       return;
     }
-    
+
     const data = await resp.json();
-    
-    if (data.products && data.products.length > 0) {
-      renderTable('products-results', data.products);
-      setMsg(`Found ${data.row_count} products in category ${data.category_id}`);
-    } else {
-      document.getElementById('products-results').innerHTML = '<p>No products found for this category.</p>';
-    }
-  } catch (e) {
-    console.error(e);
-    setMsg('Network error - is the Flask API running?', true);
+    const rows = data.items || [];
+    renderProductsTable(rows);
+  } catch (err) {
+    console.error(err);
+    setProductsMsg('Network error - is the Flask API running?', true);
   }
 }
 
-// Show top categories
 async function loadTopCategories() {
-  setMsg('');
-  const limEl = document.getElementById('products-limit');
-  const resultsEl = document.getElementById('products-results');
-  const limit = Number(limEl?.value || 10);
+  setProductsMsg('');
 
-  showLoadingProducts(resultsEl);
-  const params = new URLSearchParams({ limit: limit });
-  const url = `${BASE_URL}/products/top-categories?${params.toString()}`;
-  
   try {
+    const url = `${PRODUCTS_API_BASE_URL}/products/top-categories`;
     const resp = await fetch(url);
-    
-    if (resp.status === 400 || resp.status === 422) {
-      const errorData = await resp.json();
-      setMsg(errorData.error || 'Validation error', true);
-      return;
-    }
-    
+
     if (!resp.ok) {
-      const text = await resp.text();
-      setMsg(`Request failed (${resp.status}): ${text}`, true);
+      setProductsMsg(`Backend error (${resp.status}).`, true);
       return;
     }
-    
+
     const data = await resp.json();
-    
-    if (data.categories && data.categories.length > 0) {
-      renderTable('products-results', data.categories);
-      setMsg(`Showing top ${data.categories.length} categories`);
-    } else {
-      document.getElementById('products-results').innerHTML = '<p>No categories found.</p>';
-    }
-  } catch (e) {
-    console.error(e);
-    setMsg('Network error - is the Flask API running?', true);
+    const rows = data.items || [];
+    renderProductsTable(rows);
+  } catch (err) {
+    console.error(err);
+    setProductsMsg('Network error - is the Flask API running?', true);
   }
 }
 
-// UI'yı Products section'a enjekte et
 document.addEventListener('DOMContentLoaded', () => {
-  const sec = document.getElementById('products-section');
-  if (!sec) return;
+  const btnByCat = document.getElementById('btn-products-by-category');
+  const btnTop = document.getElementById('btn-top-categories');
 
-  if (!document.getElementById('products-category-id')) {
-    sec.insertAdjacentHTML('beforeend', `
-      <div class="controls">
-        <label>Category ID:
-          <input id="products-category-id" type="number" placeholder="e.g. 21">
-        </label>
-        <label>Limit:
-          <input id="products-limit" type="number" value="10" min="1" max="100">
-        </label>
-        <button id="btn-products-by-category">Get products by category</button>
-        <button id="btn-top-categories">Show top categories</button>
-        <button id="products-demo-btn" class="demo-btn">📝 Use demo values</button>
-      </div>
-      <div id="products-msg" class="msg"></div>
-      <div id="products-results" class="results"></div>
-    `);
-  }
-
-  document.getElementById('btn-products-by-category')?.addEventListener('click', loadProductsByCategory);
-  document.getElementById('btn-top-categories')?.addEventListener('click', loadTopCategories);
-  
-  // Demo button handler
-  document.getElementById('products-demo-btn')?.addEventListener('click', () => {
-    const categoryInput = document.getElementById('products-category-id');
-    const limitInput = document.getElementById('products-limit');
-    
-    if (categoryInput) categoryInput.value = '1';
-    if (limitInput) limitInput.value = '10';
-    
-    // Auto-trigger the query
-    loadProductsByCategory();
-  });
+  if (btnByCat) btnByCat.addEventListener('click', loadProductsByCategory);
+  if (btnTop) btnTop.addEventListener('click', loadTopCategories);
 });
