@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Demo - Olist Analytics{% endblock %}
+
+{% block content %}
+<h1>Demo Page</h1>
+
+<div style="background: #e8f4f8; padding: 20px; border-radius: 5px; margin-bottom: 30px; border-left: 4px solid #667eea;">
+    <h2 style="margin-top: 0; color: #667eea;">⚠️ Raw SQL Only - No ORM</h2>
+    <p style="font-size: 16px; margin: 10px 0;">
+        <strong>This project uses raw SQL exclusively.</strong> All database operations are performed using 
+        <code>cursor.execute()</code> with parameterized queries. No ORM (SQLAlchemy, Django ORM, etc.) or 
+        SQL abstraction layers are used.
+    </p>
+</div>
+
+<h2>CRUD Operations (Customers)</h2>
+<p>The following pages demonstrate full CRUD functionality using raw SQL:</p>
+<ul style="line-height: 2;">
+    <li>
+        <strong><a href="{{ url_for('customers.customers_ui') }}">Customers List</a></strong> - 
+        Displays all customers using <code>SELECT</code> queries
+    </li>
+    <li>
+        <strong><a href="{{ url_for('customers.customers_create_get') }}">Create Customer</a></strong> - 
+        Form-based customer creation using <code>INSERT</code> statements
+    </li>
+    <li>
+        <strong>Edit Customer</strong> - 
+        Update existing customers using <code>UPDATE</code> statements (accessible from Customers List)
+    </li>
+    <li>
+        <strong>Delete Customer</strong> - 
+        Remove customers using <code>DELETE</code> statements (accessible from Customers List)
+    </li>
+</ul>
+
+<h2>Analytics Queries</h2>
+<p>Complex SQL queries demonstrating advanced database operations:</p>
+<ul style="line-height: 2;">
+    <li>
+        <strong><a href="{{ url_for('analytics.sales_by_state') }}">Sales by State</a></strong> - 
+        Complex query using 4+ tables (customers, orders, order_items, order_payments) with 
+        <code>JOIN</code>, <code>GROUP BY</code>, and aggregate functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>)
+    </li>
+    <li>
+        <strong><a href="{{ url_for('analytics.high_value_customers') }}">High Value Customers</a></strong> - 
+        Nested subquery example showing customers whose total payment exceeds the average customer payment
+    </li>
+</ul>
+
+<h2>Technical Details</h2>
+<div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
+    <h3 style="margin-top: 0;">Database Connection</h3>
+    <p>All queries use the <code>db.get_conn()</code> helper function which supports both PostgreSQL and MySQL.</p>
+    
+    <h3>Query Pattern</h3>
+    <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>with db.get_conn() as conn:
+    with conn.cursor() as cur:
+        cur.execute(sql, (params,))
+        rows = cur.fetchall()</code></pre>
+    
+    <h3>Security</h3>
+    <p>All queries use parameterized statements to prevent SQL injection attacks.</p>
+</div>
+
+<h2>Quick Links</h2>
+<div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
+    <a href="{{ url_for('customers.customers_ui') }}" 
+       style="background: #667eea; color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600;">
+        Customers List
+    </a>
+    <a href="{{ url_for('customers.customers_create_get') }}" 
+       style="background: #48bb78; color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600;">
+        Create Customer
+    </a>
+    <a href="{{ url_for('analytics.sales_by_state') }}" 
+       style="background: #ed8936; color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600;">
+        Sales Analytics
+    </a>
+    <a href="{{ url_for('analytics.high_value_customers') }}" 
+       style="background: #9f7aea; color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 600;">
+        High Value Customers
+    </a>
+</div>
+{% endblock %}
