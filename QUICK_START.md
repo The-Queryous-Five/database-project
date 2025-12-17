@@ -1,56 +1,52 @@
 # 🚀 Quick Start Guide - Olist Analytics Platform
 
-## ✅ Both Servers Are Running!
+> **Goal**: Get the demo running in **10 minutes or less**
 
-### 🎯 Access Your Application
+## Prerequisites
 
-**Frontend (Next.js Dashboard):**
-- 🌐 URL: **http://localhost:3000**
-- 📱 Beautiful modern UI with glassmorphism design
-- 🎨 Dark gradient background with smooth animations
-
-**Backend (Flask API):**
-- 🔧 URL: **http://localhost:5001**
-- 📊 Health check: http://localhost:5001/health
-- 🔗 CORS enabled for frontend communication
+- MySQL 9.5+ installed and running
+- Python 3.9+ with `venv`
+- Node.js 18+ with npm
+- Git (with LFS if cloning fresh)
 
 ---
 
-## 📊 Current Status
+## 1️⃣ Setup (One Time Only)
 
-| Service | Status | Port | URL |
-|---------|--------|------|-----|
-| **Next.js Frontend** | ✅ Running | 3000 | http://localhost:3000 |
-| **Flask Backend** | ✅ Running | 5001 | http://localhost:5001 |
-| **MySQL Database** | ✅ Running | 3306 | localhost:3306 |
+### Clone & Install Dependencies (5 min)
 
----
-
-## 🎨 Available Pages
-
-Navigate through the sidebar to access:
-
-1. **📊 Dashboard** (`/`) - Overview with statistics
-2. **👥 Customers** (`/customers`) - Customer analytics and search
-3. **📦 Orders** (`/orders`) - Order management (coming soon)
-4. **🏷️ Products** (`/products`) - Product catalog (coming soon)
-5. **💳 Payments** (`/payments`) - Payment analytics (coming soon)
-6. **⭐ Reviews** (`/reviews`) - Review statistics (coming soon)
-7. **📈 Analytics** (`/analytics`) - Advanced analytics (coming soon)
-
----
-
-## 🔧 How to Restart Servers
-
-### Option 1: Quick Restart (if servers are running)
 ```bash
-# The servers should already be running!
-# Just refresh your browser at http://localhost:3000
+# Navigate to project
+cd /Users/yusakaraaslan/Desktop/dersler\ 2025\ güz/db/proje/database-project
+
+# Python setup
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Frontend setup
+cd olist-dashboard
+npm install
+cd ..
 ```
 
-### Option 2: Manual Start
+### Database Setup (2 min)
 
-**Terminal 1 - Flask Backend:**
+```bash
+# Start MySQL (if not running)
+brew services start mysql
+
+# Database should already be created with data
+# If not: mysql -u root -e "CREATE DATABASE olist;"
+# Then run: ./scripts/load_all_data.sh
+```
+
+---
+
+## 2️⃣ Run the Demo (2 min)
+
+### Terminal 1 - Start Flask Backend
+
 ```bash
 cd /Users/yusakaraaslan/Desktop/dersler\ 2025\ güz/db/proje/database-project
 source venv/bin/activate
@@ -58,149 +54,84 @@ export PYTHONPATH="$(pwd):$PYTHONPATH"
 flask --app app/app.py run --port 5001
 ```
 
-**Terminal 2 - Next.js Frontend:**
+**Expected output**: `Running on http://127.0.0.1:5001`
+
+### Terminal 2 - Start Next.js Frontend
+
 ```bash
 cd /Users/yusakaraaslan/Desktop/dersler\ 2025\ güz/db/proje/database-project/olist-dashboard
 npm run dev
 ```
 
-### Option 3: Use the startup script
-```bash
-cd /Users/yusakaraaslan/Desktop/dersler\ 2025\ güz/db/proje/database-project
-./start-servers.sh
-```
+**Expected output**: `Ready on http://localhost:3000`
 
 ---
 
-## 🧪 Test the API
+## 3️⃣ Test the Demo (1 min)
+
+### Health Check
 
 ```bash
-# Health check
 curl http://localhost:5001/health
-
-# Get top cities
-curl "http://localhost:5001/customers/top-cities?limit=5"
-
-# Search customers by state
-curl "http://localhost:5001/customers/by-state/SP?limit=10"
+# Expected: {"message": "Server is healthy", "status": "OK"}
 ```
 
----
+### Open Dashboard
 
-## 📱 Features Currently Working
+**Browser**: http://localhost:3000
 
-### ✅ Dashboard Page
-- 4 animated stat cards showing:
-  - 👥 Total Customers: 99,163
-  - 📦 Total Orders: 99,441
-  - 🏷️ Products: 32,951
-  - ⭐ Reviews: 98,410
-- Quick action links
-- System status indicators
-
-### ✅ Customers Page
-- 🔍 Search by state
-- 📊 Top cities ranking
-- 📋 Beautiful data tables
-- ⚡ Real-time API integration
-- 🎨 Loading states and error handling
+**Test flow**:
+1. Dashboard shows 4 stat cards (customers, orders, products, reviews)
+2. Click "Customers" → Search by state (e.g., "SP")
+3. Click "Orders" → View recent orders and stats
+4. Click "Products" → Browse products, filter by category
+5. Click "Payments" → See payment type breakdown
+6. Click "Reviews" → Filter by star rating
 
 ---
 
-## 🎨 Design Features
+## 🎯 What You Should See
 
-- ✨ Glassmorphism sidebar
-- 🌈 Gradient backgrounds
-- 🎭 Smooth hover animations
-- 📱 Fully responsive
-- 🎯 Professional typography
-- ⚡ Fast page transitions
-
----
-
-## 🛠️ Tech Stack
-
-```
-Frontend:
-├── Next.js 16 (App Router)
-├── TypeScript
-├── Tailwind CSS
-├── Lucide React (icons)
-└── Axios (HTTP client)
-
-Backend:
-├── Flask 3.0.3
-├── Flask-CORS
-├── MySQL Connector
-└── Python 3.9
-
-Database:
-└── MySQL 9.5.0
-    ├── 9 tables
-    └── 1.3M+ rows
-```
+| Page | Features |
+|------|----------|
+| **Dashboard** | 4 stat cards, navigation links |
+| **Customers** | State search, top cities table |
+| **Orders** | Recent orders, order stats, search by ID/customer/status |
+| **Products** | Product list, category filter, stats |
+| **Payments** | Payment breakdown by type, stats |
+| **Reviews** | Review cards, star rating filter, stats |
+| **Analytics** | Charts with time range and metric filters |
 
 ---
 
-## 📊 Database Tables
+## 🚨 Quick Troubleshooting
 
-| Table | Rows | Status |
-|-------|------|--------|
-| categories | 71 | ✅ Loaded |
-| customers | 99,163 | ✅ Loaded |
-| sellers | 3,088 | ✅ Loaded |
-| geo_zip | 19,015 | ✅ Loaded |
-| products | 32,951 | ✅ Loaded |
-| orders | 99,441 | ✅ Loaded |
-| order_items | 112,650 | ✅ Loaded |
-| order_payments | 103,886 | ✅ Loaded |
-| order_reviews | 98,410 | ✅ Loaded |
+| Problem | Solution |
+|---------|----------|
+| Flask won't start | `lsof -i :5001` → `kill -9 <PID>` |
+| Next.js won't start | `cd olist-dashboard && rm -rf .next && npm run dev` |
+| API calls fail | Check Flask is running: `curl http://localhost:5001/health` |
+| MySQL not running | `brew services start mysql` |
+| Port conflict | Kill process: `lsof -i :3000` or `lsof -i :5001` |
 
 ---
 
-## 🔥 Hot Tips
+## 📊 Database Info
 
-1. **Auto-refresh**: Next.js has hot reload - just save your changes!
-2. **API Errors**: Check Flask logs if API calls fail
-3. **Port conflicts**: Kill processes on ports 3000 or 5001 if needed
-4. **Database**: MySQL must be running (`brew services list`)
-
----
-
-## 🚨 Troubleshooting
-
-### Next.js won't start
-```bash
-cd olist-dashboard
-rm -rf .next
-npm run dev
-```
-
-### Flask won't start
-```bash
-# Check if port 5001 is in use
-lsof -i :5001
-# Kill the process if needed
-kill -9 <PID>
-```
-
-### API calls failing
-1. Check Flask is running: `curl http://localhost:5001/health`
-2. Check CORS is enabled in `app/app.py`
-3. Verify `.env` file has correct database settings
+- **Database**: `olist` (MySQL 9.5.0)
+- **Tables**: 9 tables with 1,368,465 total rows
+- **Connection**: `localhost:3306` (root, no password)
 
 ---
 
-## 🎉 You're All Set!
+## 📚 More Documentation
 
-**Your professional analytics dashboard is running!**
-
-👉 **Open your browser:** http://localhost:3000
-
-Enjoy exploring your beautiful Olist Analytics Platform! 🌟
+- **API Endpoints**: See `API_ENDPOINTS.md`
+- **Frontend Guide**: See `FRONTEND_README.md`
+- **Schema & Queries**: See `SCHEMA_FIXES.md` and `NESTED_QUERIES.md`
 
 ---
 
 <div align="center">
-  <strong>Made with ❤️ for Database Systems Course 2025</strong>
+  <strong>✅ Demo ready in 10 minutes!</strong>
 </div>
