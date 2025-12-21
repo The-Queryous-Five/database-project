@@ -65,7 +65,14 @@ async function loadOrdersByCustomer() {
     showLoadingOrders(resultsDiv);
 
     try {
+<<<<<<< HEAD
+        // 2. API İsteği (Backend'in 5001 portunda çalıştığını varsayıyoruz)
+        const url = `http://127.0.0.1:5001/orders/by-customer/${customerId}?limit=${limit}`;
+        console.log("İstek atılıyor:", url); // Hata ayıklama için log
+
+=======
         const url = `${API_BASE_ORDERS}/orders/by-customer/${encodeURIComponent(customerId)}?limit=${encodeURIComponent(limit)}`;
+>>>>>>> origin/dev
         const response = await fetch(url);
 
         if (!response.ok) {
