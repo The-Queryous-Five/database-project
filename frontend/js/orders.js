@@ -65,7 +65,9 @@ async function loadOrdersByCustomer() {
     showLoadingOrders(resultsDiv);
 
     try {
+        // 2. API İsteği (Backend'den sipariş verilerini getir)
         const url = `${API_BASE_ORDERS}/orders/by-customer/${encodeURIComponent(customerId)}?limit=${encodeURIComponent(limit)}`;
+        console.log("İstek atılıyor:", url); // Hata ayıklama için log
         const response = await fetch(url);
 
         if (!response.ok) {

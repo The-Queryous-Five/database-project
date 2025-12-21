@@ -1,5 +1,6 @@
 # Database Health Check Script for Windows
-# Tests database connectivity and basic queries.
+# Tests database connectivity and basic queries
+# Run from repo root: .\scripts\check-health.ps1
 
 # Function to load .env file
 function Load-EnvFile {
@@ -40,7 +41,7 @@ Write-Host "Database: $env:DB_VENDOR at $env:DB_HOST`:$env:DB_PORT/$env:DB_NAME"
 Write-Host "============================================================================" -ForegroundColor Green
 Write-Host ""
 
-# Check Python and test script
+# Check if official test tool exists
 $testScript = "tools\test_db_connection.py"
 $pythonPath = ".\venv\Scripts\python.exe"
 
@@ -49,39 +50,47 @@ if (-not (Test-Path $pythonPath)) {
     exit 1
 }
 
-# Run the test
-Write-Host "Running database connection test..." -ForegroundColor Cyan
-
 if (Test-Path $testScript) {
-    & $pythonPath -m tools.test_db_connection
-    $exitCode = $LASTEXITCODE
-} else {
-    Write-Host "WARNING: tools\test_db_connection.py not found, using basic test" -ForegroundColor Yellow
+    # Use the official test tool
+    Write-Host "Running database connection test..." -ForegroundColor Cyan
     
-    # Basic connection test
-    $exitCode = 1
-    try {
-        & $pythonPath -c "import os; from app.db.db import get_conn; conn=get_conn(); conn.close(); print('[OK] Connection successful'); exit(0)"
-        $exitCode = $LASTEXITCODE
-    } catch {
-        Write-Host "[ERROR] Connection test failed" -ForegroundColor Red
-        $exitCode = 1
+    & $pythonPath -m tools.test_db_connection
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ""
+        Write-Host "============================================================================" -ForegroundColor Green
+        Write-Host "SUCCESS: HEALTH CHECK PASSED" -ForegroundColor Green
+        Write-Host "============================================================================" -ForegroundColor Green
+        Write-Host "Database is ready for demo!" -ForegroundColor Yellow
+        Write-Host ""
+        exit 0
+    } else {
+        Write-Host ""
+        Write-Host "============================================================================" -ForegroundColor Red
+        Write-Host "FAILED: HEALTH CHECK FAILED" -ForegroundColor Red
+        Write-Host "============================================================================" -ForegroundColor Red
+        Write-Host "Please check your database connection settings." -ForegroundColor Yellow
+        Write-Host ""
+        exit 1
     }
-}
-
-Write-Host ""
-if ($exitCode -eq 0) {
-    Write-Host "============================================================================" -ForegroundColor Green
-    Write-Host "[OK] HEALTH CHECK PASSED" -ForegroundColor Green
-    Write-Host "============================================================================" -ForegroundColor Green
-    Write-Host "Database is ready for demo!" -ForegroundColor Yellow
-    Write-Host ""
-    exit 0
 } else {
-    Write-Host "============================================================================" -ForegroundColor Red
-    Write-Host "[ERROR] HEALTH CHECK FAILED" -ForegroundColor Red
-    Write-Host "============================================================================" -ForegroundColor Red
-    Write-Host "Please check your database connection settings." -ForegroundColor Yellow
+    # Fallback: basic connection test
+    Write-Host "WARNING: $testScript not found, using basic test..." -ForegroundColor Yellow
     Write-Host ""
-    exit 1
+    
+    & $pythonPath -c "import os, sys; db_vendor = os.getenv('DB_VENDOR'); print(f'Testing {db_vendor} connection...'); import mysql.connector if db_vendor == 'mysql' else __import__('psycopg'); conn = mysql.connector.connect(host=os.getenv('DB_HOST'), port=int(os.getenv('DB_PORT', 3306)), user=os.getenv('DB_USER'), password=os.getenv('DB_PASS'), database=os.getenv('DB_NAME')) if db_vendor == 'mysql' else __import__('psycopg').connect(host=os.getenv('DB_HOST'), port=int(os.getenv('DB_PORT', 5432)), user=os.getenv('DB_USER'), password=os.getenv('DB_PASS'), dbname=os.getenv('DB_NAME')); cursor = conn.cursor(); cursor.execute('SELECT 1'); result = cursor.fetchone(); cursor.close(); conn.close(); print('SUCCESS: Connection test passed!'); sys.exit(0)"
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ""
+        Write-Host "============================================================================" -ForegroundColor Green
+        Write-Host "SUCCESS: HEALTH CHECK PASSED" -ForegroundColor Green
+        Write-Host "============================================================================" -ForegroundColor Green
+        exit 0
+    } else {
+        Write-Host ""
+        Write-Host "============================================================================" -ForegroundColor Red
+        Write-Host "FAILED: HEALTH CHECK FAILED" -ForegroundColor Red
+        Write-Host "============================================================================" -ForegroundColor Red
+        exit 1
+    }
 }
