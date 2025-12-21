@@ -2,9 +2,8 @@
  * Products tab – uses /products/by-category and /products/top-categories
  */
 
-const PRODUCTS_API_BASE_URL = typeof API_BASE_URL !== 'undefined'
-  ? API_BASE_URL
-  : 'http://127.0.0.1:5000';
+const BASE_URL = window.API_BASE_URL || 'http://127.0.0.1:5000';
+const PRODUCTS_API_BASE_URL = BASE_URL;
 
 function setProductsMsg(text, isError = false) {
   const el = document.getElementById('products-msg');
