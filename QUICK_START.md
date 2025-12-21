@@ -72,6 +72,8 @@ FLASK_APP=app/app.py
 
 **💡 Important:** Use your real MySQL password, not "changeme" or "root"!
 
+**💡 MySQL Workbench users:** Connection user/password must match `.env` credentials.
+
 ---
 
 ### Step 3: Setup Database & Load Data
@@ -144,7 +146,7 @@ Click the demo buttons to test each feature:
    - Recent reviews
    - Review statistics
 
-6. **Analytics (Sprint B)** 🔥 **NEW!**
+6. **Analytics (Sprint B)** 🔥
    - Revenue by Category (multi-table JOIN + GROUP BY)
    - Top Sellers (DISTINCT counting + geographic analysis)
    - Review vs Delivery (HAVING + date math)
