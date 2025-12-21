@@ -8,17 +8,26 @@ products_bp = Blueprint("products", __name__, url_prefix="/products")
 
 @products_bp.get("/sample")
 def products_sample():
-    q = request.args.get("n")
+    """
+    Simple helper endpoint for frontend/demo testing.
+
+    Usage:
+    GET /products/sample?n=3  ->  {"items": [...3 fake products...]}
+    """
+    q = request.args.get("n", "5")
     try:
         n = int(q)
     except (TypeError, ValueError):
         return jsonify(error="n must be integer in [1,100]"), 422
+
     if not (1 <= n <= 100):
         return jsonify(error="n must be between 1 and 100"), 422
 
-    items = [{"product_id": i, "name": f"placeholder_{i}"} for i in range(1, n+1)]
+    items = [
+        {"product_id": i, "name": f"placeholder_{i}"}
+        for i in range(1, n + 1)
+    ]
     return jsonify(items=items)
-
 
 @products_bp.get("/by-category")
 def products_by_category():
