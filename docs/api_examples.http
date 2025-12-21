@@ -17,3 +17,31 @@ GET http://localhost:5000/reviews/stats?min_score=1&max_score=3
 
 ### Orders of a customer
 GET http://localhost:5000/orders/by-customer/1234567890?limit=5
+
+### ============================================
+### Customers Geo Analytics (Enes - Week X)
+### ============================================
+
+### Customers by City - Valid request
+GET http://localhost:5000/customers/by-city?state=SP&city=sao_paulo&limit=10
+
+### Customers by City - Missing state (should return 400)
+GET http://localhost:5000/customers/by-city?city=sao_paulo&limit=10
+
+### Customers by City - Missing city (should return 400)
+GET http://localhost:5000/customers/by-city?state=SP&limit=10
+
+### Customers by City - Invalid state format (should return 422)
+GET http://localhost:5000/customers/by-city?state=SPA&city=sao_paulo&limit=10
+
+### Customers by City - Limit out of range (should return 422)
+GET http://localhost:5000/customers/by-city?state=SP&city=sao_paulo&limit=100
+
+### Top States by Customer Count - Valid request
+GET http://localhost:5000/geo/top-states?limit=10
+
+### Top States by Customer Count - Default limit
+GET http://localhost:5000/geo/top-states
+
+### Top States by Customer Count - Limit out of range (should return 422)
+GET http://localhost:5000/geo/top-states?limit=50

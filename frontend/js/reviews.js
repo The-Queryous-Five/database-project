@@ -5,7 +5,7 @@
  * Week 4 Task: Display review stats filtered by score range (1-5)
  */
 
-const API_BASE_URL = "http://127.0.0.1:5001";
+const API_BASE_URL = window.API_BASE_URL || 'http://127.0.0.1:5000';
 
 /**
  * Load review statistics based on min_score and max_score
@@ -101,5 +101,20 @@ async function loadReviewStats() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Demo button handler
+    const demoBtn = document.getElementById("reviews-demo-btn");
+    if (demoBtn) {
+        demoBtn.addEventListener("click", () => {
+            const minScoreInput = document.getElementById("reviews-min-score");
+            const maxScoreInput = document.getElementById("reviews-max-score");
+            
+            if (minScoreInput) minScoreInput.value = "4";
+            if (maxScoreInput) maxScoreInput.value = "5";
+            
+            // Auto-trigger the query
+            loadReviewStats();
+        });
+    }
+    
     console.log("reviews.js loaded - Review stats UI ready");
 });

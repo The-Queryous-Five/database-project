@@ -7,3 +7,7 @@ venv/
 *.log
 flask.log
 olist-dashboard/
+
+.env.save
+PR_BODY_WEEK2.md
+frontend/products_demo.html

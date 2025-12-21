@@ -1,137 +1,380 @@
-# 🚀 Quick Start Guide - Olist Analytics Platform
+# 🚀 Quick Start Guide - Olist Analytics Platform (Windows)
 
-> **Goal**: Get the demo running in **10 minutes or less**
+**BLG212E Database Management Systems Project**
 
-## Prerequisites
-
-- MySQL 9.5+ installed and running
-- Python 3.9+ with `venv`
-- Node.js 18+ with npm
-- Git (with LFS if cloning fresh)
+This guide helps you set up and run the Olist Analytics demo on Windows in ~10 minutes.
 
 ---
 
-## 1️⃣ Setup (One Time Only)
+## 📋 Prerequisites
 
-### Clone & Install Dependencies (5 min)
+### Required Software
 
-```bash
-# Navigate to project
-cd /Users/yusakaraaslan/Desktop/dersler\ 2025\ güz/db/proje/database-project
+1. **Python 3.8+**
+   - Download: https://www.python.org/downloads/
+   - ✅ Check: `python --version`
 
-# Python setup
-python3 -m venv venv
-source venv/bin/activate
+2. **MySQL 8.0+**
+   - Download: https://dev.mysql.com/downloads/installer/
+   - Install MySQL Server during setup
+   - ✅ Check: MySQL service running in Services panel
+
+3. **Git** (optional, for cloning)
+   - Download: https://git-scm.com/download/win
+
+### Optional Tools
+
+- **MySQL Workbench** - Visual database management
+- **VS Code** - Code editing with Python extension
+
+---
+
+## 🛠️ Initial Setup (One-Time)
+
+### Step 1: Clone or Download Repository
+
+```powershell
+git clone https://github.com/The-Queryous-Five/database-project.git
+cd database-project
+```
+
+### Step 2: Create Python Virtual Environment
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-
-# Frontend setup
-cd olist-dashboard
-npm install
-cd ..
 ```
 
-### Database Setup (2 min)
+If you get an execution policy error:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 
-```bash
-# Start MySQL (if not running)
-brew services start mysql
+### Step 3: Configure Environment Variables
 
-# Database should already be created with data
-# If not: mysql -u root -e "CREATE DATABASE olist;"
-# Then run: ./scripts/load_all_data.sh
+Create `.env` file in project root:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env` with your MySQL credentials:
+
+```env
+DB_VENDOR=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=olist
+DB_USER=root
+DB_PASS=YOUR_MYSQL_ROOT_PASSWORD
+
+FLASK_ENV=development
+FLASK_APP=app/app.py
+```
+
+**Important:** Replace `YOUR_MYSQL_ROOT_PASSWORD` with your actual MySQL root password.
+
+### Step 4: Create Database
+
+```powershell
+.\scripts\mysql-create-db.ps1
+```
+
+When prompted, enter your MySQL root password.
+
+### Step 5: Apply Database Schema (DDL)
+
+```powershell
+.\scripts\apply_ddl_mysql.ps1
+```
+
+This creates all tables with the correct structure.
+
+### Step 6: Load Data (ETL)
+
+```powershell
+.\scripts\run_etl_minimal.ps1
+```
+
+This loads core demo data:
+- Categories
+- Geolocation
+- Customers
+- Sellers
+- Products
+- Orders
+- Order Items
+- Payments
+- Reviews
+
+**Note:** ETL scripts expect CSV data in `db/data/` directory.
+
+### Step 7: Test Database Connection
+
+```powershell
+python -m tools.test_db_connection
+```
+
+Expected output:
+```
+[OK] Database connection successful!
+Vendor: mysql
+Host: 127.0.0.1:3306
+Database: olist
 ```
 
 ---
 
-## 2️⃣ Run the Demo (2 min)
+## ▶️ Running the Demo
 
-### Terminal 1 - Start Flask Backend
+### Quick Start (One Command)
 
-```bash
-cd /Users/yusakaraaslan/Desktop/dersler\ 2025\ güz/db/proje/database-project
-source venv/bin/activate
-export PYTHONPATH="$(pwd):$PYTHONPATH"
-flask --app app/app.py run --port 5001
+```powershell
+.\scripts\start-servers.ps1
 ```
 
-**Expected output**: `Running on http://127.0.0.1:5001`
+This will:
+1. ✅ Activate virtual environment
+2. ✅ Check required packages
+3. ✅ Start Flask backend on http://127.0.0.1:5000
+4. ✅ Open frontend in browser
 
-### Terminal 2 - Start Next.js Frontend
+### Manual Start (Alternative)
 
-```bash
-cd /Users/yusakaraaslan/Desktop/dersler\ 2025\ güz/db/proje/database-project/olist-dashboard
-npm run dev
+If you prefer to start services manually:
+
+**Backend:**
+```powershell
+.\venv\Scripts\Activate.ps1
+flask run --host 127.0.0.1 --port 5000
 ```
 
-**Expected output**: `Ready on http://localhost:3000`
-
----
-
-## 3️⃣ Test the Demo (1 min)
-
-### Health Check
-
-```bash
-curl http://localhost:5001/health
-# Expected: {"message": "Server is healthy", "status": "OK"}
+**Frontend:**
+```powershell
+Start-Process "frontend\index.html"
 ```
 
-### Open Dashboard
+---
 
-**Browser**: http://localhost:3000
+## 🎯 Using the Application
 
-**Test flow**:
-1. Dashboard shows 4 stat cards (customers, orders, products, reviews)
-2. Click "Customers" → Search by state (e.g., "SP")
-3. Click "Orders" → View recent orders and stats
-4. Click "Products" → Browse products, filter by category
-5. Click "Payments" → See payment type breakdown
-6. Click "Reviews" → Filter by star rating
+### Frontend URL
+**http://127.0.0.1:5000** (opens in browser automatically)
+
+### Available Features
+
+1. **Customers** 
+   - Query by state
+   - Top cities by customer count
+   - Demo button auto-fills sample values
+
+2. **Orders**
+   - Search by customer ID
+   - Filter by limit
+
+3. **Products**
+   - Top categories
+   - Search by name
+
+4. **Payments**
+   - Payment statistics
+   - Filter by payment type
+
+5. **Reviews**
+   - Review statistics
+   - Filter by score range
+
+### Using Demo Buttons
+
+Each section has a **"📝 Use demo values"** button:
+- Click it to auto-fill sample query parameters
+- Automatically runs the query
+- Great for quick testing!
 
 ---
 
-## 🎯 What You Should See
+## 🔧 Troubleshooting
 
-| Page | Features |
-|------|----------|
-| **Dashboard** | 4 stat cards, navigation links |
-| **Customers** | State search, top cities table |
-| **Orders** | Recent orders, order stats, search by ID/customer/status |
-| **Products** | Product list, category filter, stats |
-| **Payments** | Payment breakdown by type, stats |
-| **Reviews** | Review cards, star rating filter, stats |
-| **Analytics** | Charts with time range and metric filters |
+### Port 5000 Already in Use
+
+If another service is using port 5000:
+
+**Option 1: Stop the other service**
+```powershell
+# Find process using port 5000
+netstat -ano | findstr :5000
+
+# Kill process (replace PID with actual process ID)
+taskkill /PID <PID> /F
+```
+
+**Option 2: Change Flask port**
+
+Edit `scripts\start-servers.ps1` and change port 5000 to another port (e.g., 5001).
+
+Also update `frontend\js\config.js`:
+```javascript
+window.API_BASE_URL = "http://127.0.0.1:5001";
+```
+
+### MySQL Connection Failed
+
+**Check MySQL Service:**
+```powershell
+Get-Service MySQL* | Select-Object Name, Status
+```
+
+If stopped:
+```powershell
+Start-Service MySQL80  # Or your MySQL service name
+```
+
+**Verify Credentials:**
+1. Open `.env` file
+2. Ensure `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS` match your MySQL setup
+3. Test connection: `python -m tools.test_db_connection`
+
+**Common MySQL Paths:**
+- Service: `C:\Program Files\MySQL\MySQL Server 8.0\`
+- Config: `C:\ProgramData\MySQL\MySQL Server 8.0\my.ini`
+
+### Virtual Environment Issues
+
+**Activation failed:**
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Missing packages:**
+```powershell
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+### DDL or ETL Fails
+
+**Check logs:**
+- DDL errors usually indicate missing database or permissions
+- ETL errors often mean missing CSV data files
+
+**Reset database:**
+```powershell
+# Drop and recreate
+mysql -u root -p -e "DROP DATABASE IF EXISTS olist; CREATE DATABASE olist;"
+
+# Reapply DDL
+.\scripts\apply_ddl_mysql.ps1
+```
+
+### Frontend Shows "Failed to Fetch"
+
+**Backend not running:**
+```powershell
+# Check if Flask is running
+Get-Process python -ErrorAction SilentlyContinue
+```
+
+**CORS issues:**
+- Backend should have CORS enabled for `http://127.0.0.1`
+- Check browser console (F12) for specific errors
+
+**Port mismatch:**
+- Verify `frontend\js\config.js` matches actual backend port
 
 ---
 
-## 🚨 Quick Troubleshooting
+## 📂 Project Structure
 
-| Problem | Solution |
-|---------|----------|
-| Flask won't start | `lsof -i :5001` → `kill -9 <PID>` |
-| Next.js won't start | `cd olist-dashboard && rm -rf .next && npm run dev` |
-| API calls fail | Check Flask is running: `curl http://localhost:5001/health` |
-| MySQL not running | `brew services start mysql` |
-| Port conflict | Kill process: `lsof -i :3000` or `lsof -i :5001` |
-
----
-
-## 📊 Database Info
-
-- **Database**: `olist` (MySQL 9.5.0)
-- **Tables**: 9 tables with 1,368,465 total rows
-- **Connection**: `localhost:3306` (root, no password)
-
----
-
-## 📚 More Documentation
-
-- **API Endpoints**: See `API_ENDPOINTS.md`
-- **Frontend Guide**: See `FRONTEND_README.md`
-- **Schema & Queries**: See `SCHEMA_FIXES.md` and `NESTED_QUERIES.md`
+```
+database-project/
+├── app/                    # Flask backend
+│   ├── app.py             # Main Flask application
+│   ├── config.py          # Configuration loader
+│   ├── db/                # Database connection
+│   └── routes/            # API endpoints
+├── db/
+│   ├── ddl_mysql/         # MySQL table schemas
+│   ├── etl/               # Data loading scripts
+│   └── data/              # CSV data files (if available)
+├── frontend/
+│   ├── index.html         # Main UI
+│   ├── css/               # Stylesheets
+│   └── js/                # JavaScript modules
+├── scripts/               # PowerShell automation
+├── tools/                 # Utility scripts
+├── .env                   # Environment config (create from .env.example)
+├── .env.example           # Template
+└── requirements.txt       # Python dependencies
+```
 
 ---
 
-<div align="center">
-  <strong>✅ Demo ready in 10 minutes!</strong>
-</div>
+## 🎓 Development Workflow
+
+### Making Changes
+
+1. **Backend changes** (Python):
+   - Edit files in `app/`
+   - Restart Flask: Ctrl+C in Flask window, then `flask run`
+
+2. **Frontend changes** (HTML/CSS/JS):
+   - Edit files in `frontend/`
+   - Refresh browser (F5)
+
+3. **Database changes**:
+   - Modify DDL in `db/ddl_mysql/`
+   - Reapply: `.\scripts\apply_ddl_mysql.ps1`
+
+### Testing
+
+```powershell
+# Test database connection
+python -m tools.test_db_connection
+
+# Test specific endpoint
+Invoke-WebRequest http://127.0.0.1:5000/customers/top-cities?limit=5
+```
+
+---
+
+## 📞 Support
+
+### Team Repository
+https://github.com/The-Queryous-Five/database-project
+
+### Common Issues
+- Check `.env` file exists and has correct MySQL credentials
+- Ensure MySQL service is running
+- Verify virtual environment is activated
+- Check port 5000 is available
+
+### Debug Mode
+Run Flask with debug output:
+```powershell
+$env:FLASK_DEBUG="1"
+flask run --host 127.0.0.1 --port 5000
+```
+
+---
+
+## ✅ Quick Verification Checklist
+
+Before demo:
+
+- [ ] MySQL service running
+- [ ] Database `olist` exists
+- [ ] Virtual environment activated
+- [ ] `.env` file configured
+- [ ] DDL applied (tables created)
+- [ ] ETL completed (data loaded)
+- [ ] Health check passes: `python -m tools.test_db_connection`
+- [ ] Backend starts: `flask run`
+- [ ] Frontend opens in browser
+- [ ] Demo buttons work
+
+---
+
+**Ready to demo! 🎉**
+
+For detailed API documentation, see `API_ENDPOINTS.md`.
