@@ -60,12 +60,6 @@ Opens at: **http://127.0.0.1:5000**
 - **[NORMALIZATION.md](docs/sprint_c/NORMALIZATION.md)** - Normalization proof (0NF → 3NF/BCNF)
 - **[PERFORMANCE.md](docs/sprint_c/PERFORMANCE.md)** - Index design, EXPLAIN analysis, 10-21x speedup
 
-### Presentation Assets (Sprint D)
-- **[SLIDE_OUTLINE.md](docs/presentation/SLIDE_OUTLINE.md)** - 15-slide outline for 15-minute presentation
-- **[SPEAKER_SPLIT_5P.md](docs/presentation/SPEAKER_SPLIT_5P.md)** - Speaker assignments for 5 people
-- **[SHOTLIST.md](docs/presentation/SHOTLIST.md)** - Screenshot targets for slides
-- **[assets/](docs/presentation/assets/)** - Editable Draw.io diagrams (ER, mapping, normalization)
-
 ---
 
 ## Project Statistics
