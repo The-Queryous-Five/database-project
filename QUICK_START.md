@@ -327,3 +327,35 @@ Before demo:
 **Ready to demo! 🎉**
 
 For detailed API documentation, see `API_ENDPOINTS.md`.
+
+---
+
+## 📚 Sprint C: Database Theory (Optional)
+
+**Advanced users:** Apply performance indexes and explore database design documentation.
+
+### Apply Performance Indexes
+
+```powershell
+# Apply 8 performance indexes for analytics queries
+mysql -u root -p olist < db\ddl_mysql\sprint_c_constraints_indexes.sql
+```
+
+These indexes improve analytics query performance by 10-21x. See [PERFORMANCE.md](docs/sprint_c/PERFORMANCE.md) for benchmarks.
+
+### Run EXPLAIN Analysis
+
+```powershell
+# Show execution plans for all 4 analytics queries
+.\scripts\explain_analytics.ps1
+```
+
+### Documentation
+
+- **[ER Diagram Guide](docs/sprint_c/ER_DIAGRAM_GUIDE.md)** - Complete ER diagram with 9 entities
+- **[ER to Relational Mapping](docs/sprint_c/ER_TO_RELATIONAL_MAPPING.md)** - Mapping rules and table design
+- **[Normalization Proof](docs/sprint_c/NORMALIZATION.md)** - Functional dependencies and 3NF/BCNF
+- **[Performance Analysis](docs/sprint_c/PERFORMANCE.md)** - Index impact on analytics queries
+
+These documents are useful for database design presentations and understanding the schema structure.
+

@@ -372,3 +372,36 @@ All the "Failed to load data" errors have been fixed. Your dashboard now display
 - ✅ Real customer reviews
 
 **Everything is working perfectly!** 🌟
+
+---
+
+## 📚 Sprint C: Database Theory & Performance
+
+Complete database design documentation and performance analysis.
+
+### Documentation Resources
+
+**ER Diagram & Mapping:**
+- [ER Diagram Guide](docs/sprint_c/ER_DIAGRAM_GUIDE.md) - Complete ER diagram with 9 entities and 8 relationships
+- [ER to Relational Mapping](docs/sprint_c/ER_TO_RELATIONAL_MAPPING.md) - Systematic mapping from ER to relational schema
+
+**Normalization:**
+- [Normalization Proof](docs/sprint_c/NORMALIZATION.md) - Functional dependencies and 3NF/BCNF decomposition
+
+**Performance Optimization:**
+- [Performance Analysis](docs/sprint_c/PERFORMANCE.md) - Index design and EXPLAIN analysis for analytics queries
+- [Constraints & Indexes SQL](db/ddl_mysql/sprint_c_constraints_indexes.sql) - 8 performance indexes
+
+### Tools
+
+**EXPLAIN Helper:**
+Run EXPLAIN analysis on all 4 analytics queries to see index usage:
+```powershell
+.\scripts\explain_analytics.ps1
+```
+
+Shows execution plans, index usage, and row counts for:
+- Revenue by Category
+- Top Sellers
+- Review vs Delivery
+- Order Funnel
