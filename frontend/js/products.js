@@ -58,7 +58,9 @@ async function loadProductsByCategory() {
     const resp = await fetch(url);
 
     if (!resp.ok) {
-      setProductsMsg(`Backend error (${resp.status}).`, true);
+      const error = new Error(`Backend error (${resp.status})`);
+      const errorMsg = window.handleFetchError ? window.handleFetchError(error, resp) : error.message;
+      setProductsMsg(errorMsg, true);
       return;
     }
 
@@ -67,7 +69,8 @@ async function loadProductsByCategory() {
     renderProductsTable(rows);
   } catch (err) {
     console.error(err);
-    setProductsMsg('Network error - is the Flask API running?', true);
+    const errorMsg = window.handleFetchError ? window.handleFetchError(err, null) : 'Network error';
+    setProductsMsg(errorMsg, true);
   }
 }
 
@@ -79,7 +82,9 @@ async function loadTopCategories() {
     const resp = await fetch(url);
 
     if (!resp.ok) {
-      setProductsMsg(`Backend error (${resp.status}).`, true);
+      const error = new Error(`Backend error (${resp.status})`);
+      const errorMsg = window.handleFetchError ? window.handleFetchError(error, resp) : error.message;
+      setProductsMsg(errorMsg, true);
       return;
     }
 
@@ -88,7 +93,8 @@ async function loadTopCategories() {
     renderProductsTable(rows);
   } catch (err) {
     console.error(err);
-    setProductsMsg('Network error - is the Flask API running?', true);
+    const errorMsg = window.handleFetchError ? window.handleFetchError(err, null) : 'Network error';
+    setProductsMsg(errorMsg, true);
   }
 }
 

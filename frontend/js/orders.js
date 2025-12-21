@@ -99,7 +99,8 @@ async function loadOrdersByCustomer() {
 
     } catch (error) {
         console.error("Error details:", error);
-        showErrorOrders(resultsDiv, `Hata: ${error.message}`);
+        const errorMsg = window.handleFetchError ? window.handleFetchError(error, { status: error.message?.includes('503') ? 503 : null }) : error.message;
+        showErrorOrders(resultsDiv, errorMsg || `Hata: ${error.message}`);
     }
 }
 

@@ -95,7 +95,8 @@ async function loadReviewStats() {
         
     } catch (error) {
         console.error("Error loading review stats:", error);
-        errorDiv.textContent = `❌ Network error - is the Flask API running?`;
+        const errorMsg = window.handleFetchError ? window.handleFetchError(error, null) : "Network error";
+        errorDiv.textContent = `❌ ${errorMsg}`;
         resultsDiv.innerHTML = "";
     }
 }
