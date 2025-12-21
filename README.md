@@ -1,76 +1,186 @@
-# Olist DB App (Flask + PostgreSQL/MySQL, dbapi2, NO ORM)
-- 5 main tablo ve ek tablolarla REST uçları.
-- Kurulum:
-  1) Python 3.11+ ve PostgreSQL 16 veya MySQL 8+ kurulu.
-  2) PowerShell: `python -m venv venv`
-     ardından: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process` → `Y`
-     `.\venv\Scripts\Activate.ps1`
-  3) `pip install -r requirements.txt`
-  4) `.env` dosyanı `.env.example`'dan kopyala ve doldur.
-  5) DDL'leri sırayla uygula: 000 → 010 → 020 → 030 → 040
-  6) ETL sırası: categories → geo_zip → products → customers/sellers → orders → order_items → payments → reviews
-  7) Çalıştır: `flask --app app/app.py --debug run`
-- Sağlık: `GET /health`
+# Olist Analytics Platform
 
-- LFS notu: tüm ekip bir kez `git lfs install` çalıştırsın.
+**BLG212E Database Management Systems - Fall 2024**  
+**Team:** The Queryous Five
 
-## Database Setup / DRY_RUN
-Henüz MySQL/PostgreSQL kurulu değilse ETL'ler **DRY_RUN=1** ile çalıştırılabilir.
+[![CI Status](https://github.com/The-Queryous-Five/database-project/actions/workflows/ci.yml/badge.svg)](https://github.com/The-Queryous-Five/database-project/actions)
 
-**Örnek komut:**
+---
+
+## Overview
+
+MySQL-backed analytics dashboard for exploring Brazilian e-commerce data from Olist marketplace. Features normalized database design (3NF/BCNF), complex multi-table queries, performance optimization with indexes, and automated testing with CI/CD.
+
+**Tech Stack:** Flask 3.0.3 + MySQL 8.0+ + Vanilla JavaScript
+
+---
+
+## Quick Start (Windows)
+
+**5-minute setup:**
+
 ```powershell
-$env:DRY_RUN=1
-python db/etl/load_products.py data/raw/olist_products_dataset.csv
+# 1. Setup virtual environment
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# 2. Configure database (edit .env)
+Copy-Item .env.example .env
+notepad .env  # Add your MySQL password
+
+# 3. Setup database
+.\scripts\mysql-create-db.ps1
+.\scripts\apply_ddl_mysql.ps1
+.\scripts\run_etl_all.ps1
+
+# 4. Start demo
+.\scripts\start-demo.ps1
 ```
 
-**DRY_RUN modunda:**
-- Veritabanına yazılmaz
-- Sadece satır sayısı ve örnek satırlar (ilk 3) loglanır
-- DB bağlantısı gerekmez
+Opens at: **http://127.0.0.1:5000**
 
-Bu mod, ETL scriptlerini test etmek ve veri kalitesini kontrol etmek için kullanılır.
+**For detailed setup, see [QUICK_START.md](QUICK_START.md)**
 
-## MySQL ile Çalışma
-1) `.env` dosyasında:
-   ```
-   DB_VENDOR=mysql
-   DB_PORT=3306
-   DB_USER=root
-   DB_PASS=<your_password>
-   ```
-2) MySQL paketini yükle: `pip install mysql-connector-python==9.0.0`
-3) DDL uygula: `.\scripts\apply_ddl_mysql.ps1`
-4) ETL çalıştır (aynı script)
+---
 
-## ETL DRY_RUN Modu (DB'siz veri önizleme)
+## Documentation
+
+### Final Deliverables (Sprint D)
+- **[OVERVIEW.md](docs/final/OVERVIEW.md)** - Project overview, architecture, tech stack
+- **[DATASET.md](docs/final/DATASET.md)** - Dataset description, size, ETL pipeline
+- **[FEATURES.md](docs/final/FEATURES.md)** - Feature catalog with screenshot checklist
+- **[COMPLEX_QUERIES.md](docs/final/COMPLEX_QUERIES.md)** - SQL query analysis, complexity breakdown
+- **[TESTING.md](docs/final/TESTING.md)** - Testing strategy, pytest coverage, CI/CD
+- **[DEMO_RUNBOOK_WINDOWS.md](docs/final/DEMO_RUNBOOK_WINDOWS.md)** - Complete demo day guide
+
+### Database Theory (Sprint C)
+- **[ER_DIAGRAM_GUIDE.md](docs/sprint_c/ER_DIAGRAM_GUIDE.md)** - Complete ER diagram with 9 entities
+- **[ER_TO_RELATIONAL_MAPPING.md](docs/sprint_c/ER_TO_RELATIONAL_MAPPING.md)** - ER → Relational mapping rules
+- **[NORMALIZATION.md](docs/sprint_c/NORMALIZATION.md)** - Normalization proof (0NF → 3NF/BCNF)
+- **[PERFORMANCE.md](docs/sprint_c/PERFORMANCE.md)** - Index design, EXPLAIN analysis, 10-21x speedup
+
+### Presentation Assets (Sprint D)
+- **[SLIDE_OUTLINE.md](docs/presentation/SLIDE_OUTLINE.md)** - 15-slide outline for 15-minute presentation
+- **[SPEAKER_SPLIT_5P.md](docs/presentation/SPEAKER_SPLIT_5P.md)** - Speaker assignments for 5 people
+- **[SHOTLIST.md](docs/presentation/SHOTLIST.md)** - Screenshot targets for slides
+- **[assets/](docs/presentation/assets/)** - Editable Draw.io diagrams (ER, mapping, normalization)
+
+---
+
+## Project Statistics
+
+- **Database:** 9 normalized tables, ~1.4M rows
+- **Orders:** 100,000+ orders from 2016-2018
+- **Products:** 32,951 products across 71 categories
+- **Customers:** 99,441 customers across 27 Brazilian states
+- **API Endpoints:** 26 REST endpoints (4 complex analytics queries)
+- **Tests:** 9 pytest tests, 100% pass rate
+- **Performance:** 10-21x speedup with 8 indexes
+
+---
+
+## Features
+
+### Data Sections
+1. **Customers** - Query by state, top cities
+2. **Orders** - Recent orders, order statistics, customer orders
+3. **Products** - Catalog, categories, product stats
+4. **Payments** - Payment type breakdown
+5. **Reviews** - Recent reviews, score distribution
+
+### Analytics (Complex Queries)
+1. **Revenue by Category** - 3-table JOIN, 5 aggregates, GROUP BY
+2. **Top Sellers** - Multi-table JOIN, seller performance analysis
+3. **Review vs Delivery** - 4-table JOIN, LEFT JOIN, TIMESTAMPDIFF, HAVING (most complex)
+4. **Order Funnel** - Status distribution, date arithmetic
+
+---
+
+## Testing & CI/CD
+
+**Automated Testing:**
+- 9 pytest tests covering all endpoints
+- Monkeypatched database (no real MySQL needed)
+- Schema validation, error handling, edge cases
+
+**CI/CD Pipeline:**
+- GitHub Actions workflow on push/PR
+- Python 3.11, syntax check, pytest
+- Status: ✅ All tests passing
+
+**Run tests locally:**
 ```powershell
-$env:DRY_RUN=1
-python db/etl/load_categories.py data/raw/product_category_name_translation.csv
-# Her dosya için ilk 3 satır örnek ve toplam satır sayısını gösterir
+.\venv\Scripts\python.exe -m pytest -v
 ```
 
-## Orphan Check (FK doğrulama)
-PostgreSQL:
+---
+
+## Advanced Features
+
+### Performance Optimization (Sprint C)
+
+Apply 8 performance indexes:
 ```powershell
-psql -U postgres -d olist -f scripts/check_orphans_postgres.sql
+mysql -u root -p olist < db\ddl_mysql\sprint_c_constraints_indexes.sql
 ```
-MySQL:
+
+**Run EXPLAIN analysis:**
 ```powershell
-mysql -u root -p olist < scripts/check_orphans_mysql.sql
+.\scripts\explain_analytics.ps1
 ```
 
-## Frontend Demo (Week 4)
+**Results:** 10-21x query speedup, ~20 MB overhead
 
-1) Flask API'yi başlat:
-   ```powershell
-   flask --app app/app.py --debug run
-   ```
+---
 
-2) `frontend/index.html` dosyasını tarayıcıda aç (File → Open veya sürükle-bırak)
+## Repository Structure
 
-3) Örneğin "Payments" bölümünden:
-   - `payment_type` alanına `credit_card` yaz
-   - "Get payments by type" butonuna bas
-   - `GET /payments/by-type` endpoint'inin sonucunu görebilirsin
+```
+database-project/
+├── app/                 # Flask application
+│   ├── routes/          # API endpoints (26 endpoints)
+│   └── db/              # Database connection
+├── data/raw/            # CSV source files (9 files)
+├── db/
+│   ├── ddl_mysql/       # MySQL schema + indexes
+│   └── etl/             # ETL scripts (9 scripts)
+├── docs/
+│   ├── final/           # Final deliverables
+│   ├── sprint_c/        # Database theory docs
+│   └── presentation/    # Presentation assets
+├── frontend/            # HTML/CSS/JS dashboard
+├── scripts/             # Automation scripts
+├── tests/               # Pytest test suite
+└── .github/workflows/   # CI/CD configuration
+```
 
-Not: CORS sorunu yaşarsan Flask app'e `flask-cors` ekleyip `CORS(app)` yapabilirsin.
+---
+
+## Team & Course
+
+**Course:** BLG212E Database Management Systems  
+**Institution:** Istanbul Technical University  
+**Semester:** Fall 2024  
+**Team:** The Queryous Five
+
+**Repository:** https://github.com/The-Queryous-Five/database-project
+
+---
+
+## Additional Notes
+
+- **LFS:** Run `git lfs install` once per team member
+- **MySQL vs PostgreSQL:** Both DDL scripts available in `/db/ddl/` and `/db/ddl_mysql/`
+
+---
+
+## Troubleshooting
+
+**Common issues:**
+- MySQL service not running → Open Services panel (Win+R → `services.msc`)
+- Wrong password in `.env` → Check MySQL Workbench credentials
+- Port 5000 blocked → Use `netstat -ano | findstr :5000` to find blocking process
+- ETL fails → Check CSV files exist in `data/raw/`
+
+**For detailed troubleshooting, see [DEMO_RUNBOOK_WINDOWS.md](docs/final/DEMO_RUNBOOK_WINDOWS.md)**
