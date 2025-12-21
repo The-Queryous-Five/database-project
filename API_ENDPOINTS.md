@@ -241,7 +241,118 @@ All endpoints return **real data** from your MySQL database:
 
 ---
 
-## 🚀 Running the Application
+## � Analytics Endpoints (Sprint B)
+
+### GET `/analytics/revenue-by-category?limit=10`
+Get revenue breakdown by product category with multi-table joins.
+
+**Complexity:** 3-table JOIN (order_items + products + orders) with GROUP BY and aggregations
+
+**Parameters:**
+- `limit` (optional): Number of categories (1-100, default: 10)
+
+**Response:**
+```json
+{
+  "ok": true,
+  "params": { "limit": 10 },
+  "data": [
+    {
+      "category_name": "electronics",
+      "items_sold": 1500,
+      "distinct_orders": 1200,
+      "total_revenue": 75000.50,
+      "avg_item_price": 50.00
+    }
+  ]
+}
+```
+
+### GET `/analytics/top-sellers?limit=10`
+Get top sellers by revenue with location data.
+
+**Complexity:** 3-table JOIN with DISTINCT counting and geographic grouping
+
+**Parameters:**
+- `limit` (optional): Number of sellers (1-100, default: 10)
+
+**Response:**
+```json
+{
+  "ok": true,
+  "params": { "limit": 10 },
+  "data": [
+    {
+      "seller_id": "abc123...",
+      "seller_city": "Sao Paulo",
+      "seller_state": "SP",
+      "order_count": 250,
+      "items_sold": 400,
+      "total_revenue": 18500.75,
+      "avg_item_price": 46.25
+    }
+  ]
+}
+```
+
+### GET `/analytics/review-vs-delivery?min_reviews=50`
+Analyze correlation between review scores and delivery times.
+
+**Complexity:** 4-table JOIN with HAVING clause and date arithmetic (TIMESTAMPDIFF)
+
+**Parameters:**
+- `min_reviews` (optional): Minimum review count filter (1-1000, default: 50)
+
+**Response:**
+```json
+{
+  "ok": true,
+  "params": { "min_reviews": 50 },
+  "data": [
+    {
+      "seller_id": "xyz789...",
+      "seller_city": "Rio de Janeiro",
+      "seller_state": "RJ",
+      "review_count": 125,
+      "avg_review_score": 4.8,
+      "avg_delivery_days": 8.5
+    }
+  ]
+}
+```
+
+### GET `/analytics/order-funnel`
+Get order counts and avg processing times by status.
+
+**Complexity:** Conditional aggregation with multiple date calculations
+
+**Response:**
+```json
+{
+  "ok": true,
+  "params": {},
+  "data": [
+    {
+      "order_status": "delivered",
+      "order_count": 96478,
+      "avg_delivery_days": 12.5,
+      "avg_approval_days": 0.5
+    },
+    {
+      "order_status": "shipped",
+      "order_count": 1107,
+      "avg_delivery_days": null,
+      "avg_approval_days": 0.4
+    }
+  ]
+}
+```
+
+**See detailed query explanations in:** [docs/QUERIES_SPRINT_B.md](docs/QUERIES_SPRINT_B.md)
+
+---
+
+## �🚀 Running the Application
 
 **Both servers are currently running:**
 
@@ -261,3 +372,36 @@ All the "Failed to load data" errors have been fixed. Your dashboard now display
 - ✅ Real customer reviews
 
 **Everything is working perfectly!** 🌟
+
+---
+
+## 📚 Sprint C: Database Theory & Performance
+
+Complete database design documentation and performance analysis.
+
+### Documentation Resources
+
+**ER Diagram & Mapping:**
+- [ER Diagram Guide](docs/sprint_c/ER_DIAGRAM_GUIDE.md) - Complete ER diagram with 9 entities and 8 relationships
+- [ER to Relational Mapping](docs/sprint_c/ER_TO_RELATIONAL_MAPPING.md) - Systematic mapping from ER to relational schema
+
+**Normalization:**
+- [Normalization Proof](docs/sprint_c/NORMALIZATION.md) - Functional dependencies and 3NF/BCNF decomposition
+
+**Performance Optimization:**
+- [Performance Analysis](docs/sprint_c/PERFORMANCE.md) - Index design and EXPLAIN analysis for analytics queries
+- [Constraints & Indexes SQL](db/ddl_mysql/sprint_c_constraints_indexes.sql) - 8 performance indexes
+
+### Tools
+
+**EXPLAIN Helper:**
+Run EXPLAIN analysis on all 4 analytics queries to see index usage:
+```powershell
+.\scripts\explain_analytics.ps1
+```
+
+Shows execution plans, index usage, and row counts for:
+- Revenue by Category
+- Top Sellers
+- Review vs Delivery
+- Order Funnel

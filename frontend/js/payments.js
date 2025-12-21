@@ -79,7 +79,8 @@ async function onPaymentsByTypeClick() {
         errorDiv.textContent = "Unexpected error: " + response.status;
     } catch (error) {
         // Handle network errors
-        errorDiv.textContent = "Network error - is the Flask API running?";
+        const errorMsg = window.handleFetchError ? window.handleFetchError(error, null) : "Network error";
+        errorDiv.textContent = errorMsg;
         console.error("Payment API error:", error);
     }
 }

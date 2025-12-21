@@ -72,6 +72,8 @@ FLASK_APP=app/app.py
 
 **💡 Important:** Use your real MySQL password, not "changeme" or "root"!
 
+**💡 MySQL Workbench users:** Connection user/password must match `.env` credentials.
+
 ---
 
 ### Step 3: Setup Database & Load Data
@@ -97,6 +99,19 @@ Each script will show ✓ or ✗ for success/failure. If any fails, fix the issu
 ---
 
 ## 🎯 Running the Demo
+
+**One-command startup:**
+
+```powershell
+.\scripts\start-demo.ps1
+```
+
+This will:
+1. ✅ Activate virtual environment
+2. ✅ Start Flask backend on http://127.0.0.1:5000
+3. ✅ Open frontend in your browser
+
+**To stop:** Press `Ctrl+C` in the PowerShell terminal
 
 ---
 
@@ -130,6 +145,13 @@ Click the demo buttons to test each feature:
 5. **Reviews**
    - Recent reviews
    - Review statistics
+
+6. **Analytics (Sprint B)** 🔥
+   - Revenue by Category (multi-table JOIN + GROUP BY)
+   - Top Sellers (DISTINCT counting + geographic analysis)
+   - Review vs Delivery (HAVING + date math)
+   - Order Funnel (conditional aggregation)
+   - **Click "🚀 Use demo values" for instant results**
 
 All API calls go to `http://127.0.0.1:5000` (configured in `frontend/js/config.js`)
 
@@ -305,3 +327,35 @@ Before demo:
 **Ready to demo! 🎉**
 
 For detailed API documentation, see `API_ENDPOINTS.md`.
+
+---
+
+## 📚 Sprint C: Database Theory (Optional)
+
+**Advanced users:** Apply performance indexes and explore database design documentation.
+
+### Apply Performance Indexes
+
+```powershell
+# Apply 8 performance indexes for analytics queries
+mysql -u root -p olist < db\ddl_mysql\sprint_c_constraints_indexes.sql
+```
+
+These indexes improve analytics query performance by 10-21x. See [PERFORMANCE.md](docs/sprint_c/PERFORMANCE.md) for benchmarks.
+
+### Run EXPLAIN Analysis
+
+```powershell
+# Show execution plans for all 4 analytics queries
+.\scripts\explain_analytics.ps1
+```
+
+### Documentation
+
+- **[ER Diagram Guide](docs/sprint_c/ER_DIAGRAM_GUIDE.md)** - Complete ER diagram with 9 entities
+- **[ER to Relational Mapping](docs/sprint_c/ER_TO_RELATIONAL_MAPPING.md)** - Mapping rules and table design
+- **[Normalization Proof](docs/sprint_c/NORMALIZATION.md)** - Functional dependencies and 3NF/BCNF
+- **[Performance Analysis](docs/sprint_c/PERFORMANCE.md)** - Index impact on analytics queries
+
+These documents are useful for database design presentations and understanding the schema structure.
+

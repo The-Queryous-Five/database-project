@@ -73,7 +73,8 @@ async function loadCustomersByState() {
         
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.error || `HTTP ${res.status}`);
+            const error = new Error(errorData.error || `HTTP ${res.status}`);
+            throw error;
         }
         
         const data = await res.json();
@@ -87,7 +88,8 @@ async function loadCustomersByState() {
         renderTable(resultsDiv, columns, data);
     } catch (err) {
         console.error("Error loading customers by state:", err);
-        showError(resultsDiv, "Error loading customers.");
+        const errorMsg = window.handleFetchError ? window.handleFetchError(err, { status: err.message?.includes('503') ? 503 : null }) : err.message;
+        showError(resultsDiv, errorMsg);
     }
 }
 
@@ -112,7 +114,9 @@ async function loadTopCities() {
 
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.error || `HTTP ${res.status}`);
+            const error = new Error(errorData.error || `HTTP ${res.status}`);
+            error.response = res;
+            throw error;
         }
 
         const data = await res.json();
@@ -125,7 +129,8 @@ async function loadTopCities() {
         renderTable(resultsDiv, columns, data);
     } catch (err) {
         console.error("Error loading top cities:", err);
-        showError(resultsDiv, "Error loading top cities.");
+        const errorMsg = window.handleFetchError ? window.handleFetchError(err, err.response) : err.message;
+        showError(resultsDiv, errorMsg);
     }
 }
 
