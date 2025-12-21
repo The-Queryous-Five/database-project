@@ -1,0 +1,99 @@
+<mxfile host="app.diagrams.net" modified="2024-12-21T00:00:00.000Z" agent="Placeholder" version="1.0">
+  <diagram name="ER to Relational Mapping" id="er-relational-mapping">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- INSTRUCTIONS -->
+        <mxCell id="instructions" value="ER TO RELATIONAL MAPPING PLACEHOLDER&#xa;&#xa;Open in Draw.io to edit this diagram.&#xa;&#xa;SHOW MAPPING RULES:&#xa;&#xa;1. Entity → Table&#xa;   customers (entity) → customers (table)&#xa;   Attributes become columns&#xa;   Entity key → Primary Key&#xa;&#xa;2. Weak Entity → Table with Composite PK&#xa;   order_items → order_items table&#xa;   PK: (order_id, order_item_id)&#xa;   FK: order_id references orders&#xa;&#xa;3. 1:N Relationship → FK in N side&#xa;   customers 1:N orders&#xa;   → orders table has customer_id FK&#xa;&#xa;4. 1:1 Relationship → FK in either side&#xa;   orders 1:1 order_reviews&#xa;   → order_reviews has order_id FK&#xa;&#xa;5. M:N Relationship → Junction Table&#xa;   (not used in our schema)&#xa;&#xa;VISUAL LAYOUT:&#xa;Left side: ER elements (entities, relationships)&#xa;Arrow: Mapping rule applied&#xa;Right side: Relational tables&#xa;&#xa;Use colors:&#xa;- Blue: Entities/Tables&#xa;- Orange: Weak entities&#xa;- Purple: Relationships&#xa;- Green: Mapping arrows" 
+          style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontFamily=Courier New;" 
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="400" height="600" as="geometry" />
+        </mxCell>
+        
+        <!-- MAPPING EXAMPLE 1: Entity → Table -->
+        <mxCell id="er-customers" value="customers&#xa;(entity)" 
+          style="whiteSpace=wrap;html=1;align=center;fontSize=14;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" 
+          vertex="1" parent="1">
+          <mxGeometry x="500" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-map1" value="Rule 1:&#xa;Entity → Table" 
+          style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#82b366;fillColor=#d5e8d4;fontSize=12;fontStyle=1;" 
+          edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="130" as="sourcePoint" />
+            <mxPoint x="740" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="table-customers" value="customers (table)&#xa;─────────────&#xa;PK: customer_id&#xa;    customer_unique_id&#xa;    customer_zip_code_prefix&#xa;    customer_city&#xa;    customer_state" 
+          style="whiteSpace=wrap;html=1;align=left;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" 
+          vertex="1" parent="1">
+          <mxGeometry x="760" y="80" width="240" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- MAPPING EXAMPLE 2: 1:N Relationship → FK -->
+        <mxCell id="er-relationship-places" value="places&#xa;(1:N)" 
+          style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;" 
+          vertex="1" parent="1">
+          <mxGeometry x="520" y="220" width="80" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-map2" value="Rule 3:&#xa;1:N → FK in N side" 
+          style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#82b366;fillColor=#d5e8d4;fontSize=12;fontStyle=1;" 
+          edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="255" as="sourcePoint" />
+            <mxPoint x="740" y="255" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="table-orders-fk" value="orders (table)&#xa;─────────────&#xa;PK: order_id&#xa;FK: customer_id → customers&#xa;    order_status&#xa;    order_purchase_timestamp&#xa;    order_delivered_customer_date" 
+          style="whiteSpace=wrap;html=1;align=left;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" 
+          vertex="1" parent="1">
+          <mxGeometry x="760" y="210" width="260" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- MAPPING EXAMPLE 3: Weak Entity → Composite PK -->
+        <mxCell id="er-order-items-weak" value="order_items&#xa;(weak entity)" 
+          style="whiteSpace=wrap;html=1;align=center;fontSize=14;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=3;" 
+          vertex="1" parent="1">
+          <mxGeometry x="500" y="380" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-map3" value="Rule 2:&#xa;Weak → Composite PK" 
+          style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#82b366;fillColor=#d5e8d4;fontSize=12;fontStyle=1;" 
+          edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="410" as="sourcePoint" />
+            <mxPoint x="740" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="table-order-items" value="order_items (table)&#xa;─────────────&#xa;PK: (order_id, order_item_id)&#xa;FK: order_id → orders&#xa;FK: product_id → products&#xa;FK: seller_id → sellers&#xa;    price&#xa;    freight_value" 
+          style="whiteSpace=wrap;html=1;align=left;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" 
+          vertex="1" parent="1">
+          <mxGeometry x="760" y="360" width="260" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Add more mapping examples as needed -->
+        
+        <!-- SUMMARY TABLE -->
+        <mxCell id="summary-title" value="MAPPING SUMMARY TABLE" 
+          style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" 
+          vertex="1" parent="1">
+          <mxGeometry x="500" y="520" width="520" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="summary-table" value="ER Element          | Table              | PK                      | FK(s)&#xa;─────────────────────|────────────────────|─────────────────────────|──────────────────────────&#xa;customers (entity)  | customers          | customer_id             | -&#xa;orders (entity)     | orders             | order_id                | customer_id→customers&#xa;order_items (weak)  | order_items        | (order_id, item_id)     | order_id→orders,&#xa;                    |                    |                         | product_id→products,&#xa;                    |                    |                         | seller_id→sellers&#xa;products (entity)   | products           | product_id              | product_category_name→categories&#xa;sellers (entity)    | sellers            | seller_id               | -" 
+          style="whiteSpace=wrap;html=1;align=left;fontSize=11;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Courier New;" 
+          vertex="1" parent="1">
+          <mxGeometry x="500" y="560" width="520" height="180" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

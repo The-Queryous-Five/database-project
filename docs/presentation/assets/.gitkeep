@@ -1,0 +1,25 @@
+# Placeholder for presentation assets
+
+This folder contains editable diagram sources and screenshots for the presentation.
+
+## Folder Structure
+
+```
+assets/
+├── .gitkeep (this file)
+├── er_diagram.drawio (ER diagram - Chen notation)
+├── er_to_relational.drawio (ER → Relational mapping)
+├── normalization_before_after.drawio (Normalization example)
+└── screenshots/ (captured during demo)
+```
+
+## Usage
+
+- **drawio files:** Open in https://app.diagrams.net/ or desktop Draw.io app
+- **screenshots:** Captured using SHOTLIST.md as guide
+
+## Notes
+
+- drawio XML files are text-based and Git-friendly
+- Screenshots should be PNG format (1920x1080)
+- Do NOT commit large binary files (> 5 MB)
