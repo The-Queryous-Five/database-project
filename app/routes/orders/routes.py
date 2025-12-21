@@ -2,16 +2,16 @@ from flask import Blueprint, request, jsonify
 from app.db import db
 import logging
 
-# Az önce yazdığımız service fonksiyonunu import ediyoruz
-from .service import get_orders_by_customer 
+# service.py dosyasından fonksiyonları import ediyoruz
+# YENİ: get_sample_customer_ids eklendi
+from .service import get_orders_by_customer, get_sample_customer_ids
 
 logger = logging.getLogger(__name__)
 
-# 'orders' adında yeni bir Blueprint (Flask modülü) oluşturuyoruz
 orders_bp = Blueprint('orders', __name__, url_prefix='/orders')
 
 #
-# Burası senin Hafta 3 görevin olan yeni endpoint:
+# 1. GÜNCELLENEN ROUTE: Müşteri Siparişleri
 #
 @orders_bp.route('/by-customer/<string:customer_id>', methods=['GET'])
 def list_orders_by_customer(customer_id):
@@ -20,8 +20,8 @@ def list_orders_by_customer(customer_id):
     GET /orders/by-customer/1234567890?limit=10
     """
     
-    # --- Validasyon (Görev 2) ---
-    limit_str = request.args.get('limit', '10') # limit'i al, yoksa 10 say
+    # --- Validasyon ---
+    limit_str = request.args.get('limit', '10')
 
     try:
         limit = int(limit_str)
@@ -29,14 +29,48 @@ def list_orders_by_customer(customer_id):
             return jsonify({"error": "limit must be between 1 and 50"}), 422
     except ValueError:
         return jsonify({"error": "limit must be a valid integer"}), 422
-    # --- Validasyon Sonu ---
-
-    # Servis fonksiyonunu çağır
+    
+    # --- Servis Çağrısı ---
     orders = get_orders_by_customer(customer_id, limit)
     
+    # --- YENİ EKLENEN KISIM: Hata Yönetimi ---
+    if orders is None:
+        # Service katmanı None döndüyse DB hatası var demektir.
+        return jsonify({
+            "error": "Database service unavailable. Please try again later.",
+            "code": "DB_CONNECTION_ERROR"
+        }), 503
+
     # Sonucu JSON olarak dön
     return jsonify(orders), 200
 
+
+#
+# 2. YENİ EKLENEN ROUTE: Demo İçin Örnek ID
+#
+@orders_bp.route('/sample-customer', methods=['GET'])
+def get_sample_customer():
+    """
+    Frontend'de demo yaparken kolaylık olsun diye geçerli Customer ID'ler döner.
+    GET /orders/sample-customer
+    """
+    # Service'den ID'leri iste (Varsayılan 5 tane)
+    customer_ids = get_sample_customer_ids(limit=5)
+    
+    # DB hatası kontrolü
+    if customer_ids is None:
+        return jsonify({"error": "Database unavailable"}), 503
+        
+    return jsonify({
+        "count": len(customer_ids),
+        "sample_ids": customer_ids
+    }), 200
+
+
+# ----------------------------------------------------------------
+# Aşağıdaki fonksiyonlar senin dosyanın orijinalinde vardı, 
+# bozmamak için aynen bırakıyorum.
+# ----------------------------------------------------------------
 
 @orders_bp.get("/stats")
 def get_order_stats():
@@ -68,7 +102,7 @@ def get_order_stats():
                         "total_orders": int(row[0]) if row[0] else 0,
                         "total_items": int(row[1]) if row[1] else 0,
                         "avg_items_per_order": float(row[2]) if row[2] else 0.0,
-                        "total_revenue": 0  # Can be calculated from order_payments if needed
+                        "total_revenue": 0  
                     }), 200
                 else:
                     return jsonify({"error": "No data available"}), 404
@@ -118,7 +152,6 @@ def get_recent_orders():
                         "customer_id": row[1],
                         "order_status": row[2],
                         "order_purchase_timestamp": row[3].isoformat() if row[3] else None,
-                        "order_delivered_customer_date": None,  # Not available in schema
                         "order_estimated_delivery_date": row[4].isoformat() if row[4] else None
                     })
                 
@@ -127,12 +160,3 @@ def get_recent_orders():
     except Exception as e:
         logger.error(f"Error fetching recent orders: {e}")
         return jsonify({"error": "Failed to fetch recent orders"}), 500
-
-#
-# NOT: Bu 'orders_bp'nin ana app/app.py dosyasında register edilmesi gerekir.
-# Eğer edilmediyse, app/app.py'a gidip
-# from app.routes.orders.routes import orders_bp
-# ...
-# app.register_blueprint(orders_bp)
-# satırlarını eklemeniz gerekebilir.
-#
