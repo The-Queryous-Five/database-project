@@ -98,6 +98,19 @@ Each script will show ✓ or ✗ for success/failure. If any fails, fix the issu
 
 ## 🎯 Running the Demo
 
+**One-command startup:**
+
+```powershell
+.\scripts\start-demo.ps1
+```
+
+This will:
+1. ✅ Activate virtual environment
+2. ✅ Start Flask backend on http://127.0.0.1:5000
+3. ✅ Open frontend in your browser
+
+**To stop:** Press `Ctrl+C` in the PowerShell terminal
+
 ---
 
 ## 🎯 Using the Demo
@@ -130,6 +143,13 @@ Click the demo buttons to test each feature:
 5. **Reviews**
    - Recent reviews
    - Review statistics
+
+6. **Analytics (Sprint B)** 🔥 **NEW!**
+   - Revenue by Category (multi-table JOIN + GROUP BY)
+   - Top Sellers (DISTINCT counting + geographic analysis)
+   - Review vs Delivery (HAVING + date math)
+   - Order Funnel (conditional aggregation)
+   - **Click "🚀 Use demo values" for instant results**
 
 All API calls go to `http://127.0.0.1:5000` (configured in `frontend/js/config.js`)
 
