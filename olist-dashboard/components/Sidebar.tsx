@@ -12,6 +12,7 @@ import {
   BarChart3,
   Database,
   Code,
+  LogIn,
 } from "lucide-react";
 
 const navigation = [
@@ -24,6 +25,7 @@ const navigation = [
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "SQL Queries", href: "/queries", icon: Code },
   { name: "DB Schema", href: "/schema", icon: Database },
+  { name: "Login/Session", href: "/login", icon: LogIn },
 ];
 
 export default function Sidebar() {

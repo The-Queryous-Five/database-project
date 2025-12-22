@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from app.routes.customers import bp_customers
 from app.routes.products import products_bp
@@ -6,12 +6,17 @@ from app.routes.orders.routes import orders_bp
 from app.routes.payments import bp_payments
 from app.routes.reviews import bp_reviews
 from app.db.db import get_conn
+import uuid
+from datetime import datetime
 
 def create_app():
     app = Flask(__name__)
     
-    # Enable CORS for all routes
-    CORS(app)
+    # Secret key for session management
+    app.secret_key = 'olist-dashboard-secret-key-2025'
+    
+    # Enable CORS for all routes with credentials support
+    CORS(app, supports_credentials=True)
     
     app.register_blueprint(orders_bp)
     app.register_blueprint(bp_customers)
@@ -475,6 +480,318 @@ ORDER BY order_count ASC""",
                 "customers (1) ─── (N) order_reviews"
             ]
         }), 200
+    
+    # ============================================================
+    # SESSION / AUTH ENDPOINTS
+    # ============================================================
+    
+    # Simple in-memory user store (for demo purposes)
+    users_db = {
+        "admin": {"password": "admin123", "name": "Admin User", "role": "admin"},
+        "demo": {"password": "demo123", "name": "Demo User", "role": "user"},
+    }
+    
+    @app.post("/auth/login")
+    def login():
+        """
+        Login endpoint - creates a session.
+        POST /auth/login
+        Body: { username, password }
+        """
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+        
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        if not username:
+            return jsonify({"error": "Username is required"}), 400
+        if not password:
+            return jsonify({"error": "Password is required"}), 400
+        
+        user = users_db.get(username)
+        if user and user['password'] == password:
+            session['user'] = {
+                'username': username,
+                'name': user['name'],
+                'role': user['role'],
+                'logged_in_at': datetime.now().isoformat()
+            }
+            return jsonify({
+                "message": "Login successful",
+                "user": {
+                    "username": username,
+                    "name": user['name'],
+                    "role": user['role']
+                }
+            }), 200
+        else:
+            return jsonify({"error": "Invalid username or password"}), 401
+    
+    @app.post("/auth/logout")
+    def logout():
+        """
+        Logout endpoint - destroys session.
+        POST /auth/logout
+        """
+        session.pop('user', None)
+        return jsonify({"message": "Logged out successfully"}), 200
+    
+    @app.get("/auth/me")
+    def get_current_user():
+        """
+        Get current logged-in user.
+        GET /auth/me
+        """
+        user = session.get('user')
+        if user:
+            return jsonify({
+                "logged_in": True,
+                "user": user
+            }), 200
+        else:
+            return jsonify({
+                "logged_in": False,
+                "user": None
+            }), 200
+    
+    # ============================================================
+    # REVIEWS CRUD ENDPOINTS
+    # ============================================================
+    
+    @app.get("/reviews/stats")
+    def get_review_stats():
+        """Get review statistics."""
+        try:
+            with get_conn() as conn:
+                with conn.cursor() as cur:
+                    sql = """
+                    SELECT 
+                        COUNT(*) as total_reviews,
+                        AVG(review_score) as avg_score
+                    FROM order_reviews
+                    WHERE review_score IS NOT NULL
+                    """
+                    cur.execute(sql)
+                    row = cur.fetchone()
+                    
+                    # Get score distribution
+                    cur.execute("""
+                        SELECT review_score, COUNT(*) as count
+                        FROM order_reviews
+                        WHERE review_score IS NOT NULL
+                        GROUP BY review_score
+                        ORDER BY review_score DESC
+                    """)
+                    dist_rows = cur.fetchall()
+                    
+                    distribution = [{"score": int(r[0]), "count": int(r[1])} for r in dist_rows]
+                    
+                    return jsonify({
+                        "total_reviews": int(row[0]) if row[0] else 0,
+                        "avg_score": float(row[1]) if row[1] else 0,
+                        "score_distribution": distribution
+                    }), 200
+        except Exception as e:
+            print(f"Error fetching review stats: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.get("/reviews/recent")
+    def get_recent_reviews():
+        """Get recent reviews with optional filters."""
+        limit = request.args.get('limit', 20, type=int)
+        score_filter = request.args.get('score', type=int)
+        
+        try:
+            with get_conn() as conn:
+                with conn.cursor() as cur:
+                    sql = """
+                    SELECT 
+                        review_id,
+                        order_id,
+                        review_score,
+                        review_comment_message,
+                        review_creation_date
+                    FROM order_reviews
+                    WHERE review_score IS NOT NULL
+                    """
+                    params = []
+                    
+                    if score_filter:
+                        sql += " AND review_score = %s"
+                        params.append(score_filter)
+                    
+                    sql += " ORDER BY review_creation_date DESC LIMIT %s"
+                    params.append(limit)
+                    
+                    cur.execute(sql, params)
+                    rows = cur.fetchall()
+                    
+                    reviews = []
+                    for row in rows:
+                        reviews.append({
+                            "review_id": row[0],
+                            "order_id": row[1],
+                            "review_score": int(row[2]) if row[2] else 0,
+                            "review_comment_title": "",
+                            "review_comment_message": row[3] or "",
+                            "review_creation_date": row[4].isoformat() if row[4] else None
+                        })
+                    
+                    return jsonify(reviews), 200
+        except Exception as e:
+            print(f"Error fetching recent reviews: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.post("/reviews/")
+    def create_review():
+        """
+        CREATE: Add a new review.
+        POST /reviews/
+        Body: { order_id, review_score, review_comment_message }
+        """
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+        
+        order_id = data.get('order_id')
+        review_score = data.get('review_score')
+        review_comment = data.get('review_comment_message', '')
+        
+        # Validation
+        if not order_id:
+            return jsonify({"error": "Order ID is required"}), 400
+        if not review_score or not (1 <= int(review_score) <= 5):
+            return jsonify({"error": "Review score must be between 1 and 5"}), 400
+        
+        try:
+            with get_conn() as conn:
+                with conn.cursor() as cur:
+                    # Check order exists
+                    cur.execute("SELECT customer_id FROM orders WHERE order_id = %s", (order_id,))
+                    order = cur.fetchone()
+                    if not order:
+                        return jsonify({"error": "Order not found"}), 404
+                    
+                    customer_id = order[0]
+                    review_id = str(uuid.uuid4()).replace('-', '')[:32]
+                    
+                    sql = """
+                    INSERT INTO order_reviews (review_id, order_id, customer_id, review_score, review_comment_message, review_creation_date)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """
+                    cur.execute(sql, (review_id, order_id, customer_id, int(review_score), review_comment, datetime.now()))
+                    conn.commit()
+                    
+                    return jsonify({
+                        "message": "Review created successfully",
+                        "review_id": review_id
+                    }), 201
+        except Exception as e:
+            print(f"Error creating review: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.put("/reviews/<string:review_id>")
+    def update_review(review_id):
+        """
+        UPDATE: Modify an existing review.
+        PUT /reviews/<review_id>
+        Body: { review_score, review_comment_message }
+        """
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+        
+        try:
+            with get_conn() as conn:
+                with conn.cursor() as cur:
+                    # Check review exists
+                    cur.execute("SELECT review_id FROM order_reviews WHERE review_id = %s", (review_id,))
+                    if not cur.fetchone():
+                        return jsonify({"error": "Review not found"}), 404
+                    
+                    update_parts = []
+                    params = []
+                    
+                    if 'review_score' in data:
+                        score = int(data['review_score'])
+                        if not (1 <= score <= 5):
+                            return jsonify({"error": "Review score must be between 1 and 5"}), 400
+                        update_parts.append("review_score = %s")
+                        params.append(score)
+                    
+                    if 'review_comment_message' in data:
+                        update_parts.append("review_comment_message = %s")
+                        params.append(data['review_comment_message'])
+                    
+                    if update_parts:
+                        params.append(review_id)
+                        sql = f"UPDATE order_reviews SET {', '.join(update_parts)} WHERE review_id = %s"
+                        cur.execute(sql, params)
+                        conn.commit()
+                    
+                    return jsonify({"message": "Review updated successfully"}), 200
+        except Exception as e:
+            print(f"Error updating review: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.delete("/reviews/<string:review_id>")
+    def delete_review(review_id):
+        """
+        DELETE: Remove a review.
+        DELETE /reviews/<review_id>
+        """
+        try:
+            with get_conn() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT review_id FROM order_reviews WHERE review_id = %s", (review_id,))
+                    if not cur.fetchone():
+                        return jsonify({"error": "Review not found"}), 404
+                    
+                    cur.execute("DELETE FROM order_reviews WHERE review_id = %s", (review_id,))
+                    conn.commit()
+                    
+                    return jsonify({"message": "Review deleted successfully"}), 200
+        except Exception as e:
+            print(f"Error deleting review: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.get("/reviews/orders-without-review")
+    def get_orders_without_review():
+        """Get orders that don't have a review yet (for dropdown)."""
+        try:
+            with get_conn() as conn:
+                with conn.cursor() as cur:
+                    sql = """
+                    SELECT o.order_id, o.order_purchase_timestamp, c.customer_city
+                    FROM orders o
+                    LEFT JOIN order_reviews r ON o.order_id = r.order_id
+                    JOIN customers c ON o.customer_id = c.customer_id
+                    WHERE r.review_id IS NULL
+                    AND o.order_status = 'delivered'
+                    ORDER BY o.order_purchase_timestamp DESC
+                    LIMIT 50
+                    """
+                    cur.execute(sql)
+                    rows = cur.fetchall()
+                    
+                    orders = []
+                    for row in rows:
+                        orders.append({
+                            "order_id": row[0],
+                            "order_date": row[1].strftime('%Y-%m-%d') if row[1] else '',
+                            "customer_city": row[2],
+                            "label": f"{row[0][:8]}... - {row[2]} ({row[1].strftime('%Y-%m-%d') if row[1] else 'N/A'})"
+                        })
+                    
+                    return jsonify(orders), 200
+        except Exception as e:
+            print(f"Error fetching orders: {e}")
+            return jsonify({"error": str(e)}), 500
     
     return app
 
