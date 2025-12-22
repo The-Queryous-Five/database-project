@@ -6,4 +6,5 @@ __pycache__/
 venv/
 *.log
 flask.log
-olist-dashboard/
+olist-dashboard/node_modules/
+olist-dashboard/.next/
